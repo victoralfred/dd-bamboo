@@ -18,13 +18,20 @@
         <resource type="download" name="images/" location="/images"/>
         <context>dd-bamboo-metrics</context>
     </web-resource>
-    <servlet name="Manifest and Authorization" key="server-manifest-oauth" class="com.ddlabs.atlassian.auth.OauthClientServlet">
-        <dependency>com.atlassian.auiplugin:ajs</dependency>
-        <description>Authorization and Manifest Servlet</description>
-        <url-pattern>/metrics/manifest</url-pattern>
-        <resource type="download" name="dd-bamboo-metrics.css" location="/css/dd-bamboo-metrics.css"/>
-        <resource type="download" name="dd-bamboo-metrics.js" location="/js/dd-bamboo-metrics.js"/>
-        <resource type="velocity" name="template" location="/com/ddlabs/atlassian/oauth-consent.vm"/>
+    <web-section key="metric.config.web.section" name="Metrics" location="system.admin" weight="100">
+        <description>Metrics Configuration</description>
+        <label key="Metrics"/>
+    </web-section>
+    <web-item key="metric.config.web.item" section="system.admin/metric.config.web.section" weight="100">
+        <description>Metrics Configuration</description>
+        <label key="Configuration"/>
+        <link>/plugins/servlet/metrics</link>
+    </web-item>
+    <servlet name="Metrics" key="metrics-config" class="com.ddlabs.atlassian.config.MetricServerConfiguration">
+        <description>Metrics Server Configuration</description>
+        <url-pattern>/metrics</url-pattern>
     </servlet>
-    
+    <rest key="server-manifest-oauth" path="/metrics" version="1.0">
+        <description>Authorization and Manifest Servlet</description>
+    </rest>
 </atlassian-plugin>
