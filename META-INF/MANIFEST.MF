@@ -1,0 +1,23 @@
+Manifest-Version: 1.0
+Atlassian-Build-Date: 2025-05-17T09:04:47+0200
+Atlassian-Plugin-Key: com.ddlabs.atlassian.dd-bamboo-metrics
+Bnd-LastModified: 1747465487664
+Build-Jdk-Spec: 11
+Bundle-Description: This is the com.ddlabs.atlassian:dd-bamboo-metrics p
+ lugin for Atlassian Bamboo.
+Bundle-DocURL: http://www.example.com/
+Bundle-ManifestVersion: 2
+Bundle-Name: dd-bamboo-metrics
+Bundle-SymbolicName: com.ddlabs.atlassian.dd-bamboo-metrics
+Bundle-Vendor: Example Company
+Bundle-Version: 1.0.0.SNAPSHOT
+Created-By: Apache Maven Bundle Plugin 5.1.9
+Export-Package: com.ddlabs.atlassian.api;version="1.0.0"
+Import-Package: java.lang,java.lang.invoke,com.atlassian.plugin.spring.s
+ canner.annotation.export,com.atlassian.plugin.spring.scanner.annotation
+ .imports,com.atlassian.sal.api,com.ddlabs.atlassian.api;version="[1.0,2
+ )",javax.inject
+Originally-Created-By: Apache Maven Bundle Plugin 5.1.9
+Spring-Context: *
+Tool: Bnd-6.3.1.202206071316
+

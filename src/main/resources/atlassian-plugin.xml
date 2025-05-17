@@ -1,0 +1,30 @@
+<atlassian-plugin key="${atlassian.plugin.key}" name="${project.name}" plugins-version="2">
+    <plugin-info>
+        <description>${project.description}</description>
+        <version>${project.version}</version>
+        <vendor name="${project.organization.name}" url="${project.organization.url}" />
+        <param name="plugin-icon">images/pluginIcon.png</param>
+        <param name="plugin-logo">images/pluginLogo.png</param>
+    </plugin-info>
+
+    <!-- add our i18n resource -->
+    <resource type="i18n" name="i18n" location="dd-bamboo-metrics"/>
+    
+    <!-- add our web resources -->
+    <web-resource key="dd-bamboo-metrics-resources" name="dd-bamboo-metrics Web Resources">
+        <dependency>com.atlassian.auiplugin:ajs</dependency>
+        <resource type="download" name="dd-bamboo-metrics.css" location="/css/dd-bamboo-metrics.css"/>
+        <resource type="download" name="dd-bamboo-metrics.js" location="/js/dd-bamboo-metrics.js"/>
+        <resource type="download" name="images/" location="/images"/>
+        <context>dd-bamboo-metrics</context>
+    </web-resource>
+    <servlet name="Manifest and Authorization" key="server-manifest-oauth" class="com.ddlabs.atlassian.auth.OauthClientServlet">
+        <dependency>com.atlassian.auiplugin:ajs</dependency>
+        <description>Authorization and Manifest Servlet</description>
+        <url-pattern>/metrics/manifest</url-pattern>
+        <resource type="download" name="dd-bamboo-metrics.css" location="/css/dd-bamboo-metrics.css"/>
+        <resource type="download" name="dd-bamboo-metrics.js" location="/js/dd-bamboo-metrics.js"/>
+        <resource type="velocity" name="template" location="/com/ddlabs/atlassian/oauth-consent.vm"/>
+    </servlet>
+    
+</atlassian-plugin>
