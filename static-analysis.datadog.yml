@@ -4,3 +4,11 @@ rulesets:
   - java-code-style
   - java-security
   - github-actions
+  - javascript-best-practices
+  - javascript-browser-security
+  - javascript-code-style
+  - javascript-common-security
+  - javascript-express
+  - javascript-inclusive
+  - javascript-node-security
+  - jsx-react

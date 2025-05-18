@@ -1,0 +1,84 @@
+<html lang="html">
+<head>
+    <title>$i18n.getText("application.name")</title>
+    <meta charset="UTF-8">
+    <meta name="decorator" content="atl.admin">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    $webResourceManager.requireResource("com.ddlabs.atlassian.dd-bamboo-metrics:dd-bamboo-metrics-resources")
+</head>
+<body>
+<div id="page_wrapper">
+    <h1>$i18n.getText("application.configuration.header")</h1>
+</div>
+<div class="form-view shared-capability-form">
+    <div class="form-view">
+        <h3>Server status</h3>
+        <p>List of metrics servers authentication and online status</p>
+        <table class="aui" id="metrics-server-status-table">
+            <thead>
+                <tr>
+                    <th>Server</th>
+                    <th>Online</th>
+                    <th>Authentication</th>
+                </tr>
+            </thead>
+            <tbody>
+                #foreach ($server in $servers)
+                <tr>
+                    <td>$server.name</td>
+                    <td>$server.online</td>
+                    <td>$server.authentication</td>
+                </tr>
+                #end
+            </tbody>
+        </table>
+    </div>
+    <div class="aui">
+        <br>
+        <h2>$i18n.getText("application.servers.add")</h2>
+    </div>
+    <form class="aui" id="metrics-server-config" method="post">
+        <div class="field-group">
+            <label for="server-name">$i18n.getText("application.servers.name")
+            <span class="aui-icon icon-required">(required)</span></label>
+            <input class="text medium-long-field" type="text" id="server-name" name="serverName"
+                   data-aui-validation-field  data-aui-validation-required="true">
+            <div class="description">$i18n.getText("application.servers.name")</div>
+        </div>
+        <div class="field-group">
+            <label for="server-description">$i18n.getText("application.servers.description")
+                <span class="aui-icon icon-required">(required)</span></label>
+            <input class="text medium-long-field" type="text" id="server-description" name="description"
+                   data-aui-validation-field  data-aui-validation-required="true">
+            <div class="description">$i18n.getText("application.servers.description")</div>
+        </div>
+        <div class="field-group">
+            <label for="server-url">$i18n.getText("application.servers.url")</label>
+            <input class="text medium-long-field" type="text" id="server-url" name="serverUrl"
+            data-aui-validation-field  data-aui-validation-required="true">
+            <div class="description">$i18n.getText("application.servers.url")</div>
+        </div>
+        <div class="field-group">
+            <label for="clientKey">Client ID</label>
+            <input class="text medium-long-field" type="text" id="clientKey" name="clientKey"
+                   data-aui-validation-field  data-aui-validation-required="true">
+            <div class="description">Client ID</div>
+        </div>
+        <div class="field-group">
+            <label for="clientSecret">Client Secret</label>
+            <input class="text medium-long-field" type="password" id="server-url" name="clientSecret"
+                   data-aui-validation-field  data-aui-validation-required="true">
+            <div class="description">Client Secret</div>
+        </div>
+        <input type="hidden" name="atl_token" id="atl_token" value="$atl_token"/>
+        <div class="buttons-container">
+            <div class="buttons">
+                <input type="submit" value="Save" class="button submit">
+            </div>
+        </div>
+    </form>
+
+</div>
+
+</body>
+</html>
