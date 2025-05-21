@@ -103,7 +103,16 @@ public class OAuth2Authorization {
         return constAuthorizationCodeForAccessTokenUrl(clientId, clientSecret,
                 redirectUri, code, codeVerifier);
     }
-    
+    /**
+     * Opens an HTTPS connection to the specified URI with the given parameters.
+     *
+     * @param uri              The URI to connect to.
+     * @param urlParameters    The URL parameters to send in the request body.
+     * @param method           The HTTP method (e.g., "POST").
+     * @param mediaType        The media type (e.g., "application/x-www-form-urlencoded").
+     * @return The HttpsURLConnection object.
+     * @throws IOException If an I/O error occurs.
+     */
     private HttpURLConnection openHttpsConnection(URI uri, String urlParameters,
                                             String method, String mediaType) throws IOException {
         HttpsURLConnection connection = connectionFactory.createConnection(uri,method,mediaType);
