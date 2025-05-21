@@ -1,5 +1,6 @@
 package com.ddlabs.atlassian.auth;
 
+import com.ddlabs.atlassian.api.HttpConnectionFactory;
 import org.springframework.stereotype.Component;
 
 import javax.net.ssl.HttpsURLConnection;

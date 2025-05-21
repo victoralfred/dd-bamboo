@@ -1,14 +1,14 @@
 package com.ddlabs.atlassian.model;
 
-public class ServerConfigModel {
+public class ServerConfigurationFields {
     private String serverName;
     private String serverUrl;
     private String description;
 
-    public ServerConfigModel() {
+    public ServerConfigurationFields() {
     }
 
-    public ServerConfigModel(String serverName, String serverUrl, String description) {
+    public ServerConfigurationFields(String serverName, String serverUrl, String description) {
         this.serverName = serverName;
         this.serverUrl = serverUrl;
         this.description = description;

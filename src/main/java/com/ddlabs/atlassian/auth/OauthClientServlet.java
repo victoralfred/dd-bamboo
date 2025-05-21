@@ -1,13 +1,13 @@
 package com.ddlabs.atlassian.auth;
 
-import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
-import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
+
 import com.ddlabs.atlassian.config.UserService;
-import com.ddlabs.atlassian.model.ServerConfigModel;
+import com.ddlabs.atlassian.model.ServerConfigurationFields;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
@@ -28,14 +28,11 @@ public class OauthClientServlet {
     private static final String PLUGIN_STORAGE_KEY = "com.ddlabs.atlassian.dd-bamboo-metrics";
     private static final Logger log = LoggerFactory.getLogger(OauthClientServlet.class);
 
-    @ComponentImport
-    private final PluginSettingsFactory pluginSettingsFactory;
     private final UserService userService;
     private final OAuth2Authorization auth2Authorization;
     private final ConcurrentHashMap<String, String> condeVerifiers = new ConcurrentHashMap<>();
     @Inject
-    public OauthClientServlet(PluginSettingsFactory pluginSettingsFactory, UserService userService, OAuth2Authorization auth2Authorization) {
-        this.pluginSettingsFactory = pluginSettingsFactory;
+    public OauthClientServlet(UserService userService, OAuth2Authorization auth2Authorization) {
         this.userService = userService;
         this.auth2Authorization = auth2Authorization;
     }
@@ -43,27 +40,25 @@ public class OauthClientServlet {
     @POST
     @Path("authorize")
     @Produces(MediaType.TEXT_PLAIN)
-    public Response authorize(final ServerConfigModel config, @Context HttpServletRequest req) {
+    public Response authorize(final ServerConfigurationFields config, @Context HttpServletRequest req) {
         userService.isAuthenticatedUserAndAdmin();
-//        String oauth_request_url;
+        String oauth_request_url;
         try {
             String codeVerifier = OAuthPKCSCodeChallenge.generateCodeVerifier();
             String codeChallenge = OAuthPKCSCodeChallenge.generateCodeChallenge(codeVerifier);
             req.getSession().setAttribute("codeVerifier", userService.encrypt(codeVerifier));
             req.getSession().setAttribute("codeChallenge",userService.encrypt(codeChallenge));
-
-//            oauth_request_url = auth2Authorization.buildAuthorizationUrl(
-//                    config.getServerUrl(),
-//                    "ac50d776-334e-11f0-bc4f-da7ad0900002",
-//                    "http://localhost:6990/bamboo/rest/metrics/1.0/authorize",
-//                    "code",
-//                    codeChallenge,
-//                    "S256");
+            oauth_request_url = auth2Authorization.buildAuthorizationUrl(
+                    config.getServerUrl(),
+                    "ac50d776-334e-11f0-bc4f-da7ad0900002",
+                    "http://localhost:6990/bamboo/rest/metrics/1.0/authorize",
+                    "code",
+                    codeChallenge,
+                    "S256");
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
-        return Response.ok("Ok").build();
-
+        return oauth_request_url!=null?Response.ok(oauth_request_url).build(): Response.serverError().build();
     }
     @GET
     @Path("authorize")

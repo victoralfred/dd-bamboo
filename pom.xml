@@ -89,8 +89,13 @@
             <version>6.1.3</version>
             <scope>provided</scope>
         </dependency>
-        </dependencies>
-
+        <dependency>
+            <groupId>com.atlassian.activeobjects</groupId>
+            <artifactId>activeobjects-plugin</artifactId>
+            <version>6.1.2</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
     <build>
         <plugins>
             <plugin>
@@ -111,6 +116,7 @@
                         <!-- Add package to export here -->
                         <Export-Package>
                             com.ddlabs.atlassian.api,
+                            com.atlassian.activeobjects.external.ActiveObjects,
                         </Export-Package>
 
                         <!-- Add package import here -->
@@ -118,6 +124,7 @@
                             org.springframework.osgi.*;resolution:="optional",
                             org.eclipse.gemini.blueprint.*;resolution:="optional",
                             javax.ws.rs,
+                            com.atlassian.activeobjects.external.ActiveObjects,
                             *,
                         </Import-Package>
 
@@ -141,6 +148,14 @@
                 </executions>
                 <configuration>
                     <verbose>false</verbose>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>10</source>
+                    <target>10</target>
                 </configuration>
             </plugin>
         </plugins>

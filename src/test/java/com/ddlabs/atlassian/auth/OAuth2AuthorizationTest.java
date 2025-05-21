@@ -1,10 +1,11 @@
 package com.ddlabs.atlassian.auth;
 
 
+import com.ddlabs.atlassian.api.HttpConnectionFactory;
 import junit.framework.TestCase;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import static com.ddlabs.atlassian.model.ApplicationProperties.*;
+
 import javax.net.ssl.HttpsURLConnection;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -12,6 +13,9 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+
+import static com.ddlabs.atlassian.model.ApplicationProperties.CONNECTION_TIMEOUT;
+import static com.ddlabs.atlassian.model.ApplicationProperties.READ_TIMEOUT;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 

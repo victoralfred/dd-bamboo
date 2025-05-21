@@ -1,22 +1,21 @@
 package com.ddlabs.atlassian.config;
 
+import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.sal.api.pluginsettings.PluginSettings;
 import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
 import com.atlassian.templaterenderer.TemplateRenderer;
-import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.ddlabs.atlassian.model.ConfiguredMetricServers;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.Serial;
+import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class MetricServerConfiguration extends HttpServlet {
-    @Serial
     private static final long serialVersionUID = 89800000L;
     private static final String PLUGIN_STORAGE_KEY = "com.ddlabs.atlassian.dd-bamboo-metrics";
     @ComponentImport
@@ -42,7 +41,7 @@ public class MetricServerConfiguration extends HttpServlet {
         Map<String, Object> params =  new HashMap<>();
         resp.setContentType("text/html; charset=UTF-8");
 
-        params.put("servers", List.of(
+        params.put("servers", Arrays.asList(
                 new ConfiguredMetricServers("Server 1", true, true),
                 new ConfiguredMetricServers("Server 2", false, false),
                 new ConfiguredMetricServers("Server 3", true, false)

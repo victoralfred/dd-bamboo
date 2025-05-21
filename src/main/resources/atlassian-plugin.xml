@@ -36,4 +36,10 @@
     <rest key="Authorization and Manifest" path="/metrics" version="1.0">
         <description>Authorization and Manifest Servlet</description>
     </rest>
+    <ao key="ao-module">
+        <description>Active Objects service used by this Metrics Server configuration</description>
+        <entity>com.ddlabs.atlassian.model.MSConfig</entity>
+
+        <upgradeTask>com.ddlabs.atlassian.model.DDMetricsAOUpgradeTask001</upgradeTask>
+    </ao>
 </atlassian-plugin>

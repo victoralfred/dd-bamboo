@@ -2,9 +2,9 @@ package com.ddlabs.atlassian.auth;
 
 import com.atlassian.plugin.spring.scanner.annotation.component.BambooComponent;
 import com.atlassian.sal.core.util.Assert;
+import com.ddlabs.atlassian.api.HttpConnectionFactory;
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import javax.net.ssl.HttpsURLConnection;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -19,22 +19,20 @@ import static com.ddlabs.atlassian.model.ApplicationProperties.READ_TIMEOUT;
 
 @BambooComponent
 public class OAuth2Authorization {
-    private static final Logger log = LoggerFactory.getLogger(OAuth2Authorization.class);
     private final HttpConnectionFactory connectionFactory;
     public OAuth2Authorization(HttpConnectionFactory connectionFactory) {
         this.connectionFactory = connectionFactory;
     }
-
     /**
-     * This method is used to build the authorization URL for the OAuth2 authorization code flow.
+     * Builds the authorization URL for OAuth2 authentication.
      *
-     * @param domain          The domain of the Metric Server instance.
-     * @param clientId        The client ID of the application.
-     * @param redirectUri     The redirect URI used in the authorization request.
-     * @param responseType    The response type (e.g., "code").
-     * @param code_challenge  The code challenge used in the authorization request.
-     * @param codeChallengeMethod The method used to generate the code challenge (e.g., "S256").
-     * @return The authorization URL as a string.
+     * @param domain            The domain of the API.
+     * @param clientId          The client ID.
+     * @param redirectUri       The redirect URI.
+     * @param responseType      The response type (e.g., "code").
+     * @param code_challenge    The code challenge.
+     * @param codeChallengeMethod The code challenge method (e.g., "S256").
+     * @return The authorization URL.
      */
     public String buildAuthorizationUrl(String domain, String clientId,
                                         String redirectUri, String responseType,
@@ -49,8 +47,18 @@ public class OAuth2Authorization {
                 "&code_challenge=" + code_challenge +
                 "&code_challenge_method=" + codeChallengeMethod;
     }
-
-
+    /**
+     * Exchanges the authorization code for an access token.
+     *
+     * @param domain            The domain of the API.
+     * @param redirectUri       The redirect URI.
+     * @param clientId          The client ID.
+     * @param clientSecret      The client secret.
+     * @param grantType         The grant type (e.g., "authorization_code").
+     * @param codeVerifier      The code verifier.
+     * @param code              The authorization code.
+     * @return The access token response as a string.
+     */
     public String exchangeAuthorizationCodeForAccessToken(String domain, String redirectUri, String clientId,
                                                String clientSecret, String grantType, String codeVerifier,
                                                           String code ) {
@@ -76,6 +84,16 @@ public class OAuth2Authorization {
         }
 
     }
+    /**
+     * Creates an HTTP connection to the specified URI with the given parameters.
+     *
+     * @param uri              The URI to connect to.
+     * @param urlParameters    The URL parameters to send in the request body.
+     * @param method           The HTTP method (e.g., "POST").
+     * @param mediaType        The media type (e.g., "application/x-www-form-urlencoded").
+     * @return The HttpURLConnection object.
+     * @throws IOException If an I/O error occurs.
+     */
     @NotNull
     public HttpURLConnection getUrlConnection(URI uri, String urlParameters,
                                               String method, String mediaType) throws IOException {
@@ -100,7 +118,16 @@ public class OAuth2Authorization {
         }
         return connection;
     }
-
+    /**
+     * Constructs the URL parameters for the authorization code exchange.
+     *
+     * @param clientId          The client ID.
+     * @param clientSecret      The client secret.
+     * @param redirectUri       The redirect URI.
+     * @param code              The authorization code.
+     * @param codeVerifier      The code verifier.
+     * @return The URL parameters as a string.
+     */
     private static String constAuthorizationCodeForAccessTokenUrl(String clientId, String clientSecret,
                                             String redirectUri, String code, String codeVerifier) {
         return "client_id=" + URLEncoder.encode(clientId, StandardCharsets.UTF_8) +
