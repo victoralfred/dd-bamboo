@@ -8,13 +8,22 @@ import org.slf4j.LoggerFactory;
 import javax.net.ssl.HttpsURLConnection;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+
+import static com.ddlabs.atlassian.model.ApplicationProperties.CONNECTION_TIMEOUT;
+import static com.ddlabs.atlassian.model.ApplicationProperties.READ_TIMEOUT;
+
 @BambooComponent
 public class OAuth2Authorization {
     private static final Logger log = LoggerFactory.getLogger(OAuth2Authorization.class);
+    private final HttpConnectionFactory connectionFactory;
+    public OAuth2Authorization(HttpConnectionFactory connectionFactory) {
+        this.connectionFactory = connectionFactory;
+    }
 
     /**
      * This method is used to build the authorization URL for the OAuth2 authorization code flow.
@@ -54,11 +63,12 @@ public class OAuth2Authorization {
         Assert.notNull(code, "Authorization code cannot be null");
 
         String tokenEndpoint = "https://api.datadoghq.com/oauth2/v1/token";
-        String urlParameters = constAuthorizationCodeForAccessTokenUrl(clientId, clientSecret,
+        String urlParameters = buildAuthorizationAccessURL(clientId, clientSecret,
                 redirectUri, code, codeVerifier);
-        log.debug("urlParameters: {}", urlParameters);
         try {
-            HttpsURLConnection con = getUrlConnection(new URI(tokenEndpoint), urlParameters);
+            HttpsURLConnection con = (HttpsURLConnection) getUrlConnection(
+                    new URI(tokenEndpoint), urlParameters
+            ,"POST","application/x-www-form-urlencoded");
             return new String(con.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
 
         } catch (IOException | URISyntaxException e) {
@@ -66,59 +76,29 @@ public class OAuth2Authorization {
         }
 
     }
-
-    public void openOAuthServerTab(String serverUrl) {
-        String os = System.getProperty("os.name");
-        try {
-            if(os.toLowerCase().contains("windows")) {
-                Runtime.getRuntime().exec("cmd /c start " + serverUrl);
-            } else if(os.toLowerCase().contains("mac")) {
-                Runtime.getRuntime().exec("open " + serverUrl);
-            } else if(os.toLowerCase().contains("nix") || os.toLowerCase().contains("nux")) {
-                Runtime.getRuntime().exec("xdg-open " + serverUrl);
-            }else {
-                log.error("Unsupported OS: {}" , os);
-            }
-        } catch (Exception e) {
-            log.error("Error opening OAuth Server Tab", e);
-            throw new RuntimeException(e);
-        }
-
+    @NotNull
+    public HttpURLConnection getUrlConnection(URI uri, String urlParameters,
+                                              String method, String mediaType) throws IOException {
+        return openHttpsConnection(uri, urlParameters, method, mediaType);
     }
-    private static String getAccessToken(String response) {
-        String accessToken = null;
-        if (response != null && response.contains("access_token")) {
-            String[] parts = response.split("&");
-            for (String part : parts) {
-                if (part.startsWith("access_token=")) {
-                    accessToken = part.substring("access_token=".length());
-                    break;
-                }
-            }
-        }
-        return accessToken;
+    public String buildAuthorizationAccessURL(String clientId, String clientSecret, String redirectUri, String code, String codeVerifier) {
+        return constAuthorizationCodeForAccessTokenUrl(clientId, clientSecret,
+                redirectUri, code, codeVerifier);
     }
-    private static @NotNull HttpsURLConnection getUrlConnection(URI uri, String urlParameters) throws IOException {
-        HttpsURLConnection con = (HttpsURLConnection) uri.toURL().openConnection();
-        con.setRequestMethod("POST");
-        con.setDoOutput(true);
-        con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-        con.setConnectTimeout(5000);
-        con.setReadTimeout(5000);
-        //log the request body
-        log.info("Request URL: {}", uri);
-        log.info("Request Method: {}", con.getRequestMethod());
-        con.getRequestProperties().entrySet().iterator().forEachRemaining(entry -> {
-            log.info("Request Header: {}: {}", entry.getKey(), entry.getValue());
-        });
-        log.info("Request Body: {}", urlParameters);
-        // Send post request
-
-        try (DataOutputStream wr = new DataOutputStream(con.getOutputStream())) {
+    
+    private HttpURLConnection openHttpsConnection(URI uri, String urlParameters,
+                                            String method, String mediaType) throws IOException {
+        HttpsURLConnection connection = connectionFactory.createConnection(uri,method,mediaType);
+        connection.setRequestMethod(method);
+        connection.setDoOutput(true);
+        connection.setRequestProperty("Content-Type", mediaType);
+        connection.setConnectTimeout(CONNECTION_TIMEOUT);
+        connection.setReadTimeout(READ_TIMEOUT);
+        try (DataOutputStream wr = new DataOutputStream(connection.getOutputStream())) {
             wr.writeBytes(urlParameters);
             wr.flush();
         }
-        return con;
+        return connection;
     }
 
     private static String constAuthorizationCodeForAccessTokenUrl(String clientId, String clientSecret,

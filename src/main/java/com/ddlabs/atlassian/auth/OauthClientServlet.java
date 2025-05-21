@@ -86,7 +86,7 @@ public class OauthClientServlet {
         // Convert string to JSON object
         Gson gson = new Gson();
         JsonObject jsonObject = gson.fromJson(response, JsonObject.class);
-// Extract elements from the JSON object
+        // Extract elements from the JSON object
         String accessToken = jsonObject.get("access_token").getAsString();
         int expiresIn = jsonObject.get("expires_in").getAsInt();
         String tokenType = jsonObject.get("token_type").getAsString();
@@ -98,8 +98,6 @@ public class OauthClientServlet {
         log.info("Token Type: {}",userService.encrypt(tokenType));
         log.info("Scope: {}", userService.encrypt(scope));
         log.info("Refresh Token: {}",userService.encrypt(refreshToken));
-
-
         return Response.temporaryRedirect(URI.create("http://localhost:6990/bamboo/plugins/servlet/metrics")).build();
     }
     // Exchange the authorization code for an access token
