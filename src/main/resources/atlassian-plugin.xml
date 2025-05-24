@@ -40,6 +40,6 @@
         <description>Active Objects service used by this Metrics Server configuration</description>
         <entity>com.ddlabs.atlassian.model.MSConfig</entity>
 
-        <upgradeTask>com.ddlabs.atlassian.model.DDMetricsAOUpgradeTask001</upgradeTask>
+        <upgradeTask>com.ddlabs.atlassian.model.MetricsAOUpgradeTask001</upgradeTask>
     </ao>
 </atlassian-plugin>

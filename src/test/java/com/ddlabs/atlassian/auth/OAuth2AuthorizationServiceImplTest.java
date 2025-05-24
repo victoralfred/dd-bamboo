@@ -20,7 +20,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 
-public class OAuth2AuthorizationServiceImplTest extends TestCase {
+public class OAuth2AuthorizationServiceImplTest {
+        //extends TestCase {
 //    private OAuth2AuthorizationService oauth2AuthorizationService;
 //    @Mock
 //    HttpsURLConnection mockedConnection;
@@ -97,4 +98,7 @@ public class OAuth2AuthorizationServiceImplTest extends TestCase {
 //            throw new RuntimeException(e);
 //        }
 //    }
+    public void voidTest() throws Exception {
+        System.out.println("Test is not implemented yet.");
+    }
 }

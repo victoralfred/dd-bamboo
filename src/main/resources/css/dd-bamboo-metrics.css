@@ -1,0 +1,14 @@
+#server-type{
+    display: block;
+    border-color: beige;
+    border-radius: 5px;
+    border-width: 2px;
+    padding: 10px;
+}
+.connected-metrics-server{
+    background-color: #7edc9d;
+    border-color: #c3e6cb;
+    text-align: center;
+    font-weight: bold;
+    color: #ffffff;
+}

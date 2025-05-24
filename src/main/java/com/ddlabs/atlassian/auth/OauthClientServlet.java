@@ -2,18 +2,17 @@ package com.ddlabs.atlassian.auth;
 
 
 import com.ddlabs.atlassian.config.UserService;
-import com.ddlabs.atlassian.model.ServerConfigProperties;
+import com.ddlabs.atlassian.model.ServerConfigBody;
+import com.ddlabs.atlassian.model.ServerType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import remote.MetricServer;
 import remote.MetricServerFactory;
+import remote.datadog.DatadogMetricServer;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -30,34 +29,76 @@ public class OauthClientServlet {
         this.metricServerFactory = metricServerFactory;
         this.userService = userService;
     }
-    @POST
-    @Path("authorize")
+    @GET
+    @Path("authorize/{serverType}")
     @Produces(MediaType.TEXT_PLAIN)
-    public Response request_authorization(final ServerConfigProperties config, @Context HttpServletRequest req) {
+    public Response request_authorization(@PathParam("serverType") String serverType, @Context HttpServletRequest req) {
         userService.isAuthenticatedUserAndAdmin();
-        MetricServer metricServer = metricServerFactory.getMetricServer(config.getServerType());
-            final String oauth_request_url =  metricServer.setupOauth2Authentication(config.getServerName());
+        MetricServer metricServer = metricServerFactory.getMetricServer(serverType);
+            final String oauth_request_url =  metricServer.setupOauth2Authentication(serverType);
             return oauth_request_url!=null?Response.ok(oauth_request_url).build(): Response.serverError().build();
 
     }
     @GET
     @Path("token")
-    public Response request_accessToken(ServerConfigProperties config,
-                                       @Context HttpServletRequest req) {
+    public Response request_accessToken(@Context HttpServletRequest req) {
         userService.isAuthenticatedUserAndAdmin();
-        MetricServer metricServer = metricServerFactory.getMetricServer(config.getServerType());
-        String access_token_response = metricServer.getAccessToken(req, config.getServerName());
-        String response = metricServer.saveServerMetadata(config.getServerType(),access_token_response);
+        MetricServer metricServer = metricServerFactory.getMetricServer(extractServerType(req.getParameter("domain")));
+        String access_token_response = metricServer.getAccessToken(req, extractServerType(req.getParameter("domain")));
+        String response = metricServer.saveServerMetadata(extractServerType(req.getParameter("domain")),
+                access_token_response,req);
         log.info("Server response {}", response);
         return Response.temporaryRedirect(URI.create("http://localhost:6990/bamboo/plugins/servlet/metrics")).build();
     }
     @POST
-    @Path("")
-    public Response saveServer(ServerConfigProperties config,
+    @Path("/save")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response saveServer(ServerConfigBody serverConfig,
                                @Context HttpServletRequest req){
         userService.isAuthenticatedUserAndAdmin();
-        MetricServer metricServer = metricServerFactory.getMetricServer(config.getServerType());
-        String savedStatus = metricServer.saveServer(config);
+        MetricServer metricServer = metricServerFactory.getMetricServer(serverConfig.getServerType());
+        String savedStatus = metricServer.saveServer(serverConfig);
         return Response.ok(savedStatus).build();
+    }
+    @POST
+    @Path("discover")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response discoverServers(ServerType serverType, @Context HttpServletRequest req) {
+        userService.isAuthenticatedUserAndAdmin();
+        MetricServer metricServer = metricServerFactory.getMetricServer(serverType.getServerType());
+        return Response.ok(metricServer.getConfigDefaults()).build();
+    }
+    /**
+     * Extracts the server type from the provided server URL.
+     * The server type is determined by the first part of the URL before the first dot.
+     *
+     * @param serverUrl the server URL to extract the type from
+     * @return the extracted server type, or null if it cannot be determined
+     */
+    private String extractServerType(String serverUrl) {
+        if (serverUrl == null || serverUrl.isEmpty()) {
+            return null;
+        }
+        String[] parts = serverUrl.split("\\.");
+        if (parts.length < 2) {
+            return null;
+        }
+        return extractClientId(parts[0]);
+    }
+    /**
+     * Extracts the client ID based on the server type.
+     * Currently, it only supports "datadoghq" as a valid server type.
+     *
+     * @param type the server type to extract the client ID from
+     * @return the client ID if the type is "datadoghq", otherwise null
+     */
+    private String extractClientId(String type) {
+        if (type == null || type.isEmpty()) {
+            return null;
+        }
+        if ("datadoghq".equalsIgnoreCase(type)) {
+            return DatadogMetricServer.class.getSimpleName().trim();
+        }
+        return null; // Return null for other server types
     }
 }

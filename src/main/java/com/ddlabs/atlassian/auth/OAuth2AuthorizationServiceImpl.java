@@ -5,6 +5,9 @@ import com.atlassian.sal.core.util.Assert;
 import com.ddlabs.atlassian.api.HttpConnectionFactory;
 import com.ddlabs.atlassian.api.OAuth2AuthorizationService;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.net.ssl.HttpsURLConnection;
 import java.io.IOException;
 import java.net.URI;
@@ -14,6 +17,7 @@ import java.nio.charset.StandardCharsets;
 
 @BambooComponent
 public class OAuth2AuthorizationServiceImpl implements OAuth2AuthorizationService {
+    private static final Logger log = LoggerFactory.getLogger(OAuth2AuthorizationServiceImpl.class);
     private final HttpConnectionFactory connectionFactory;
     public OAuth2AuthorizationServiceImpl(HttpConnectionFactory connectionFactory) {
         this.connectionFactory = connectionFactory;

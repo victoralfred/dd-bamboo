@@ -1,8 +1,9 @@
 package com.ddlabs.atlassian.model;
 import net.java.ao.Entity;
+
 public interface MSConfig extends Entity {
     void setServerName(String serverName);
-    void setDescription(String description); ;
+    void setDescription(String description);
     void setServerType(String serverType);
     void setDomain(String domain);
     void setClientSecret(String clientSecret);
@@ -15,11 +16,18 @@ public interface MSConfig extends Entity {
     void setCodeChallenge(String codeChallenge);
     void setAccessToken(String accessToken);
     void setRefreshToken(String refreshToken);
-    void setAccessTokenExpiredIn(int expiredIn);
+    void setAccessTokenExpiry(Long accessTokenExpiry);
     void setTokenType(String tokenType);
     void setScope(String scope);
+    void setCodeCreationTime(Long codeCreationTime);
+    void setCodeExpirationTime(Long codeExpirationTime);
+    void setEnabled(Boolean enabled);
+    void setConfigured(Boolean configured);
+    void setApiEndpoint(String apiEndpoint);
+    void setOauthEndpoint(String oauthEndpoint);
+    void setTokenEndpoint(String tokenEndpoint);
     String getServerName();
-    String getDescription(); ;
+    String getDescription();
     String getServerType();
     String getDomain();
     String getClientSecret();
@@ -32,7 +40,14 @@ public interface MSConfig extends Entity {
     String getCodeChallenge();
     String getAccessToken();
     String getRefreshToken();
-    String getAccessTokenExpiredI();
+    Long getAccessTokenExpiry();
     String getTokenType();
-
+    Long getCodeCreationTime();
+    Long getCodeExpirationTime();
+    Boolean getEnabled();
+    Boolean getConfigured();
+    String getApiEndpoint();
+    String getOauthEndpoint();
+    String getTokenEndpoint();
+    String getScope();
 }

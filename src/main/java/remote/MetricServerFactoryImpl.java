@@ -1,5 +1,7 @@
 package remote;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -8,6 +10,7 @@ import java.util.Optional;
 
 @Component
 public class MetricServerFactoryImpl implements MetricServerFactory {
+    private final Logger logger = LoggerFactory.getLogger(MetricServerFactoryImpl.class);
     private final Map<String, MetricServer> metricServers;
     public MetricServerFactoryImpl(Map<String, MetricServer> metricServers) {
         this.metricServers = new HashMap<>(metricServers);
@@ -17,6 +20,7 @@ public class MetricServerFactoryImpl implements MetricServerFactory {
     }
     @Override
     public MetricServer getMetricServer(String provider) {
+        metricServers.forEach((k, v) -> logger.debug("Registered MetricServer: {} -> {}", k, v.getClass().getSimpleName()));
         return Optional.ofNullable(metricServers.get(provider.toLowerCase()))
                 .orElseThrow(() -> new IllegalArgumentException("Unknown metric provider: " + provider));
     }
