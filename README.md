@@ -10,3 +10,7 @@ Full documentation is always available at:
 
 https://developer.atlassian.com/display/DOCS/Introduction+to+the+Atlassian+Plugin+SDK
 
+First save the Metric server.
+Popup a modal for the authentication process
+If successful, mark as success
+

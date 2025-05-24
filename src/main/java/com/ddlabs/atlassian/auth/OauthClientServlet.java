@@ -2,11 +2,11 @@ package com.ddlabs.atlassian.auth;
 
 
 import com.ddlabs.atlassian.config.UserService;
-import com.ddlabs.atlassian.model.ServerConfigurationFields;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
+import com.ddlabs.atlassian.model.ServerConfigProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import remote.MetricServer;
+import remote.MetricServerFactory;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
@@ -18,91 +18,46 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
-import java.security.NoSuchAlgorithmException;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Path("/")
 public class OauthClientServlet {
-    private static final String PLUGIN_STORAGE_KEY = "com.ddlabs.atlassian.dd-bamboo-metrics";
     private static final Logger log = LoggerFactory.getLogger(OauthClientServlet.class);
-
+    private final MetricServerFactory metricServerFactory;
     private final UserService userService;
-    private final OAuth2Authorization auth2Authorization;
-    private final ConcurrentHashMap<String, String> condeVerifiers = new ConcurrentHashMap<>();
     @Inject
-    public OauthClientServlet(UserService userService, OAuth2Authorization auth2Authorization) {
+    public OauthClientServlet(MetricServerFactory metricServerFactory,
+                              UserService userService) {
+        this.metricServerFactory = metricServerFactory;
         this.userService = userService;
-        this.auth2Authorization = auth2Authorization;
     }
-
     @POST
     @Path("authorize")
     @Produces(MediaType.TEXT_PLAIN)
-    public Response authorize(final ServerConfigurationFields config, @Context HttpServletRequest req) {
+    public Response request_authorization(final ServerConfigProperties config, @Context HttpServletRequest req) {
         userService.isAuthenticatedUserAndAdmin();
-        String oauth_request_url;
-        try {
-            String codeVerifier = OAuthPKCSCodeChallenge.generateCodeVerifier();
-            String codeChallenge = OAuthPKCSCodeChallenge.generateCodeChallenge(codeVerifier);
-            req.getSession().setAttribute("codeVerifier", userService.encrypt(codeVerifier));
-            req.getSession().setAttribute("codeChallenge",userService.encrypt(codeChallenge));
-            oauth_request_url = auth2Authorization.buildAuthorizationUrl(
-                    config.getServerUrl(),
-                    "ac50d776-334e-11f0-bc4f-da7ad0900002",
-                    "http://localhost:6990/bamboo/rest/metrics/1.0/authorize",
-                    "code",
-                    codeChallenge,
-                    "S256");
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
-        return oauth_request_url!=null?Response.ok(oauth_request_url).build(): Response.serverError().build();
+        MetricServer metricServer = metricServerFactory.getMetricServer(config.getServerType());
+            final String oauth_request_url =  metricServer.setupOauth2Authentication(config.getServerName());
+            return oauth_request_url!=null?Response.ok(oauth_request_url).build(): Response.serverError().build();
+
     }
     @GET
-    @Path("authorize")
-    public Response redirectFromServer(@Context HttpServletRequest req) {
+    @Path("token")
+    public Response request_accessToken(ServerConfigProperties config,
+                                       @Context HttpServletRequest req) {
         userService.isAuthenticatedUserAndAdmin();
-        // Retrieve the code verifier and challenge from the session
-        Object codeVerifier = req.getSession().getAttribute("codeVerifier");
-        String code = req.getParameter("code");
-        String clientId = req.getParameter("client_id");
-        String site = req.getParameter("site");
-        String domain = req.getParameter("domain");
-        String dd_oid = req.getParameter("dd_oid");
-        String dd_org_name = req.getParameter("dd_org_name");
-        String secret = "ddocs_Y6bDXR7xskJtfDA3ZZlo7NJ6e44T1bb";
-        String redirect = "http://localhost:6990/bamboo/rest/metrics/1.0/authorize";
-        //save the variables in the database
-        String response = exchangeAuthorizationCodeForAccessToken(code, clientId,
-                URLDecoder.decode(site, StandardCharsets.UTF_8), domain, dd_oid, dd_org_name,
-                secret,redirect, userService.decrypt(String.valueOf(codeVerifier)));
-        // Convert string to JSON object
-        Gson gson = new Gson();
-        JsonObject jsonObject = gson.fromJson(response, JsonObject.class);
-        // Extract elements from the JSON object
-        String accessToken = jsonObject.get("access_token").getAsString();
-        int expiresIn = jsonObject.get("expires_in").getAsInt();
-        String tokenType = jsonObject.get("token_type").getAsString();
-        String scope = jsonObject.get("scope").getAsString();
-        String refreshToken = jsonObject.get("refresh_token").getAsString();
-        // Print the extracted values
-        log.info("Access Token: {}" ,userService.encrypt(accessToken));
-        log.info("Expires In: {}" ,userService.encrypt(String.valueOf(expiresIn)));
-        log.info("Token Type: {}",userService.encrypt(tokenType));
-        log.info("Scope: {}", userService.encrypt(scope));
-        log.info("Refresh Token: {}",userService.encrypt(refreshToken));
+        MetricServer metricServer = metricServerFactory.getMetricServer(config.getServerType());
+        String access_token_response = metricServer.getAccessToken(req, config.getServerName());
+        String response = metricServer.saveServerMetadata(config.getServerType(),access_token_response);
+        log.info("Server response {}", response);
         return Response.temporaryRedirect(URI.create("http://localhost:6990/bamboo/plugins/servlet/metrics")).build();
     }
-    // Exchange the authorization code for an access token
-    private String exchangeAuthorizationCodeForAccessToken(String code, String clientId, String site,
-                                                            String domain, String dd_oid, String dd_org_name,
-                                                String clientSecret,
-                                                String redirectUri, String codeVerifier) {
-        return auth2Authorization.exchangeAuthorizationCodeForAccessToken(domain,
-                redirectUri, clientId, clientSecret, "authorization_code", codeVerifier, code);
+    @POST
+    @Path("")
+    public Response saveServer(ServerConfigProperties config,
+                               @Context HttpServletRequest req){
+        userService.isAuthenticatedUserAndAdmin();
+        MetricServer metricServer = metricServerFactory.getMetricServer(config.getServerType());
+        String savedStatus = metricServer.saveServer(config);
+        return Response.ok(savedStatus).build();
     }
-
-
 }
