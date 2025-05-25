@@ -99,6 +99,6 @@ public class OauthClientServlet {
         if ("datadoghq".equalsIgnoreCase(type)) {
             return DatadogMetricServer.class.getSimpleName().trim();
         }
-        return null; // Return null for other server types
+        return null;
     }
 }

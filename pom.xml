@@ -28,6 +28,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
+        <ao.version>6.1.2</ao.version>
     </properties>
 
     <dependencies>
@@ -63,7 +64,6 @@
             <version>5.14.2</version>
             <scope>test</scope>
         </dependency>
-
         <!-- WIRED TEST RUNNER DEPENDENCIES -->
         <dependency>
             <groupId>com.atlassian.plugins</groupId>
@@ -92,8 +92,14 @@
         <dependency>
             <groupId>com.atlassian.activeobjects</groupId>
             <artifactId>activeobjects-plugin</artifactId>
-            <version>6.1.2</version>
+            <version>${ao.version}</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.atlassian.activeobjects</groupId>
+            <artifactId>activeobjects-test</artifactId>
+            <version>${ao.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
     <build>
