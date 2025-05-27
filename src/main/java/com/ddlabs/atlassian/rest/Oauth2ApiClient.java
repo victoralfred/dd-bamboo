@@ -1,4 +1,4 @@
-package com.ddlabs.atlassian.auth;
+package com.ddlabs.atlassian.rest;
 
 
 import com.ddlabs.atlassian.config.UserService;
@@ -6,9 +6,9 @@ import com.ddlabs.atlassian.model.ServerConfigBody;
 import com.ddlabs.atlassian.model.ServerType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import remote.MetricServer;
-import remote.MetricServerFactory;
-import remote.datadog.DatadogMetricServer;
+import com.ddlabs.atlassian.remote.MetricServer;
+import com.ddlabs.atlassian.remote.MetricServerFactory;
+import com.ddlabs.atlassian.remote.datadog.DatadogMetricServer;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
@@ -19,13 +19,13 @@ import javax.ws.rs.core.Response;
 import java.net.URI;
 
 @Path("/")
-public class OauthClientServlet {
-    private static final Logger log = LoggerFactory.getLogger(OauthClientServlet.class);
+public class Oauth2ApiClient {
+    private static final Logger log = LoggerFactory.getLogger(Oauth2ApiClient.class);
     private final MetricServerFactory metricServerFactory;
     private final UserService userService;
     @Inject
-    public OauthClientServlet(MetricServerFactory metricServerFactory,
-                              UserService userService) {
+    public Oauth2ApiClient(MetricServerFactory metricServerFactory,
+                           UserService userService) {
         this.metricServerFactory = metricServerFactory;
         this.userService = userService;
     }

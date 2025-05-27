@@ -6,9 +6,15 @@
     padding: 10px;
 }
 .connected-metrics-server{
-    background-color: #7edc9d;
+    background-color: #0e704a;
     border-color: #c3e6cb;
     text-align: center;
     font-weight: bold;
     color: #ffffff;
+}
+.aui-icon-refresh{
+    color: #1b3225;
+    border: 1px solid #1b3225;
+    font-size: x-large;
+    background-color: #1b3225;
 }

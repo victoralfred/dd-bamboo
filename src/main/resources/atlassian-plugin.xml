@@ -15,6 +15,7 @@
     <web-resource key="dd-bamboo-metrics-resources" name="Web Resources">
         <dependency>com.atlassian.auiplugin:ajs</dependency>
         <dependency>com.atlassian.auiplugin:aui-form-validation</dependency>
+        <dependency>com.atlassian.auiplugin:aui-experimental-iconfont</dependency>
         <resource type="download" name="dd-bamboo-metrics.css" location="/css/dd-bamboo-metrics.css"/>
         <resource type="download" name="dd-bamboo-metrics.js" location="/js/dd-bamboo-metrics.js"/>
         <resource type="download" name="images/" location="/images"/>
@@ -35,11 +36,16 @@
     </servlet>
     <rest key="Authorization and Manifest" path="/metrics" version="1.0">
         <description>Authorization and Manifest Servlet</description>
+        <package>com.ddlabs.atlassian.rest</package>
     </rest>
+
     <ao key="ao-module">
         <description>Active Objects service used by this Metrics Server configuration</description>
         <entity>com.ddlabs.atlassian.model.MSConfig</entity>
-
         <upgradeTask>com.ddlabs.atlassian.model.MetricsAOUpgradeTask001</upgradeTask>
     </ao>
+    <job-config name="My job" key="triggerOAuthTokenRefresh">
+        <job key="triggerOAuthTokenRefresh" perClusterJob="true" clusteredOnly="false"/>
+        <schedule repeat-interval="3600" repeat-count="5"/>
+    </job-config>
 </atlassian-plugin>

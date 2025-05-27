@@ -91,6 +91,25 @@ public class PluginDaoRepositoryImpl implements PluginDaoRepository {
         return configs.stream().map(transformServerList).collect(Collectors.toList());
     }
 
+    @Override
+    public void deleteServerConfig(String serverType) {
+        ao.executeInTransaction(() -> {
+            MSConfig[] configs = ao.find(MSConfig.class, "server_type = ?", serverType);
+            if (configs.length > 0) {
+                ao.delete(configs[0]);
+                log.info("Server configuration deleted for type: {}", serverType);
+            } else {
+                log.warn("No server configuration found: {}", serverType);
+            }
+            return null;
+        });
+    }
+
+    @Override
+    public List<MSConfig> getMsConfig() {
+        return List.of(ao.find(MSConfig.class));
+    }
+
     public static <T> T checkNotNull(@CheckForNull T reference) {
         if (reference == null) {
             throw new NullPointerException();

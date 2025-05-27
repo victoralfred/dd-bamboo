@@ -1,4 +1,4 @@
-package remote.datadog;
+package com.ddlabs.atlassian.remote.datadog;
 
 import com.ddlabs.atlassian.api.OAuth2AuthorizationService;
 import com.ddlabs.atlassian.api.PluginDaoRepository;
@@ -7,13 +7,12 @@ import com.ddlabs.atlassian.config.UserService;
 import com.ddlabs.atlassian.model.*;
 import com.ddlabs.atlassian.util.HelperUtil;
 import com.ddlabs.atlassian.util.exceptions.NullOrEmptyFieldsException;
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import remote.MetricServer;
+import com.ddlabs.atlassian.remote.MetricServer;
 import javax.servlet.http.HttpServletRequest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;

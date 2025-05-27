@@ -39,4 +39,15 @@ public interface PluginDaoRepository {
      * @return a list of configured metric servers
      */
     List<ConfiguredMetricServers> getAllServerConfigs();
+    /**
+     * Deletes a server configuration by its type.
+     *
+     * @param serverType the type of the server to delete
+     */
+    void deleteServerConfig(String serverType);
+    /**
+     * Retrieves all {@link MSConfig} configuration from Database
+     * @return the server configuration if found, otherwise null
+     */
+    List<MSConfig> getMsConfig();
 }

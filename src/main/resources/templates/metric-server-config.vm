@@ -22,8 +22,7 @@
             <thead>
                 <tr>
                     <th class="aui-table-column-issue-key">Server</th>
-                    <th>Online</th>
-                    <th>Authentication</th>
+                    <th>Status</th>
                     <th>Action</th>
                 </tr>
             </thead>
@@ -31,17 +30,24 @@
                 #foreach ($server in $servers)
                 <tr>
                     <td>$server.name</td>
-                    <td>$server.online</td>
-                    <td>$server.authentication</td>
+                    <td>
+                        #if ($server.online == true)
+                            <span class="aui-lozenge aui-lozenge-success">Connected</span>
+                        #else
+                            <span class="aui-lozenge aui-lozenge-error">Error</span>
+                        #end
+                    </td>
                     <td>
                         #if ($server.authentication != true)
                             <button class="aui-button aui-button-primary" id="connect-metrics-server-oauth"
                                     data-server-id="$server.serverType">Authenticate</button>
                         #else
-                            <button class="aui-button
-                            aui-button-green connected-metrics-server"
-                                    data-server-id="$server.id">Connected</button>
+                            <button class="aui-button connected-metrics-server"
+                                    data-server-id="$server.serverType">Refresh</button>
                         #end
+                        <button class="aui-button connected-metrics-server"
+                                id="test-oauth"
+                                data-server-id="$server.serverType">Test</button>
                     </td>
                 </tr>
                 #end

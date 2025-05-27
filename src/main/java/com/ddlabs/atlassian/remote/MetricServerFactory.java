@@ -1,4 +1,4 @@
-package remote;
+package com.ddlabs.atlassian.remote;
 
 
 public interface MetricServerFactory {

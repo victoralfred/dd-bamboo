@@ -16,6 +16,7 @@ AJS.toInit (() => {
     // Add a click event to the button with id connect-metrics-server-oauth
     AJS.$("#connect-metrics-server-oauth").click((e) => {
         e.preventDefault();
+        AJS.dialog2("#oauth-screen").show();
         const serverId = AJS.$(e.currentTarget).data("server-id");
         if (serverId) {
             serverType.val(serverId);
@@ -24,10 +25,6 @@ AJS.toInit (() => {
 
     const urlPattern = /^(https:\/\/)([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/[a-zA-Z0-9\-._~:/?#[\]@!$&'()*+,;=%]*)*(\?client_id=[^&]+&redirect_uri=[^&]+&response_type=[^&]+.*)?$/;
     const httpsUrlPattern = /^https:\/\/([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,6}(:\d+)?(\/[^\s]*)?$/;
-        AJS.$("#connect-metrics-server-oauth").click((e) =>{
-            e.preventDefault();
-            AJS.dialog2("#oauth-screen").show();
-        });
         AJS.$("#authentication-proceed-button").click( (e) => {
             e.preventDefault();
             AJS.$.ajax(({
@@ -197,7 +194,56 @@ AJS.toInit (() => {
             }
         });
     }
-
+  AJS.$("#test-oauth").click((event) => {
+        event.preventDefault();
+      const serverId = AJS.$("#test-oauth").data("server-id");
+      if (serverId) {
+          serverType.val(serverId);
+      }
+      console.log(serverId);
+      const API_TEST = PLUGIN_BASE_URL + "/rest/metrics/1.0/kpi/" + serverType.val().trim();
+        AJS.$.ajax({
+            url: API_TEST,
+            type: "GET",
+            success: (data) => {
+                console.log(data);
+                if (data) {
+                    messageFlag = AJS.flag({
+                        type: "success",
+                        body: 'API is working',
+                        close: "auto"
+                    })
+                } else {
+                    messageFlag = AJS.flag({
+                        type: "error",
+                        body: 'Error when testing API',
+                        close: "auto"
+                    })
+                }
+            },
+            error: (data) => {
+                if (data.status === 400) {
+                    messageFlag = AJS.flag({
+                        type: "error",
+                        body: 'Invalid URL or parameters',
+                        close: "auto"
+                    })
+                } else if (data.status === 500) {
+                    messageFlag = AJS.flag({
+                        type: "error",
+                        body: 'Internal server error',
+                        close: "auto"
+                    })
+                }else {
+                    messageFlag = AJS.flag({
+                        type: "error",
+                        body: 'Error when testing API',
+                        close: "auto"
+                    })
+                }
+            }
+        })
+    })
 })
 
 const validateFields = (serverName, serverTypeSelector,

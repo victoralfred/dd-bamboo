@@ -101,6 +101,11 @@
             <version>${ao.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.datadoghq</groupId>
+            <artifactId>datadog-api-client</artifactId>
+            <version>2.24.0</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
