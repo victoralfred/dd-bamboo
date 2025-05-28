@@ -129,6 +129,25 @@
                         <Export-Package>
                             com.ddlabs.atlassian.api,
                             com.atlassian.activeobjects.external.ActiveObjects,
+                            com.fasterxml.jackson.module.jaxb,
+                            com.sun.jdi,com.sun.jdi.connect,
+                            com.sun.jdi.connect.spi,
+                            com.sun.jdi.event,
+                            com.sun.jdi.request,
+                            jakarta.inject,
+                            jakarta.validation,
+                            jakarta.validation.metadata,
+                            org.glassfish.jersey.server,
+                            org.glassfish.jersey.server.filter,
+                            org.glassfish.jersey.server.internal.inject,
+                            org.glassfish.jersey.server.model,
+                            org.glassfish.jersey.server.spi.internal,
+                            org.hibernate.validator,
+                            sun.misc,
+                            com.datadog.api.client,
+                            com.datadog.api.client.v2.api,
+                            com.datadog.api.client.v2.model,
+                            com.datadog.api.client.v2.model.MetricPayload
                         </Export-Package>
 
                         <!-- Add package import here -->
@@ -137,6 +156,7 @@
                             org.eclipse.gemini.blueprint.*;resolution:="optional",
                             javax.ws.rs,
                             com.atlassian.activeobjects.external.ActiveObjects,
+                            com.datadog.api.client.v2.*;resolution:="optional",
                             *,
                         </Import-Package>
 
