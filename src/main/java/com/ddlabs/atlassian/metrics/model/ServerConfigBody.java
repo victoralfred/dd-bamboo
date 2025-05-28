@@ -1,4 +1,4 @@
-package com.ddlabs.atlassian.model;
+package com.ddlabs.atlassian.metrics.model;
 
 public class ServerConfigBody {
     private String apiEndpoint;

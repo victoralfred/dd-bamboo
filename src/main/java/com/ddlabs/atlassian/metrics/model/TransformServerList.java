@@ -1,4 +1,4 @@
-package com.ddlabs.atlassian.model;
+package com.ddlabs.atlassian.metrics.model;
 
 import org.springframework.stereotype.Component;
 

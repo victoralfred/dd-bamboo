@@ -9,8 +9,8 @@ import java.net.HttpURLConnection;
 import java.net.ProtocolException;
 import java.net.URI;
 
-import static com.ddlabs.atlassian.model.ApplicationProperties.CONNECTION_TIMEOUT;
-import static com.ddlabs.atlassian.model.ApplicationProperties.READ_TIMEOUT;
+import static com.ddlabs.atlassian.metrics.model.ApplicationProperties.CONNECTION_TIMEOUT;
+import static com.ddlabs.atlassian.metrics.model.ApplicationProperties.READ_TIMEOUT;
 
 @Component
 public class DefaultHttpConnectionFactory implements HttpConnectionFactory {
@@ -41,7 +41,6 @@ public class DefaultHttpConnectionFactory implements HttpConnectionFactory {
         connection.setRequestProperty("Content-Type", mediaType);
         connection.setConnectTimeout(CONNECTION_TIMEOUT);
         connection.setReadTimeout(READ_TIMEOUT);
-
     }
     private boolean requiresRequestBody(String method) {
        return method.equals("POST") || method.equals("PUT") || method.equals("PATCH");

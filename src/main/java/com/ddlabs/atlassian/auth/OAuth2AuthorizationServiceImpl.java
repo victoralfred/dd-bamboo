@@ -6,8 +6,8 @@ import com.ddlabs.atlassian.api.HttpConnectionFactory;
 import com.ddlabs.atlassian.api.OAuth2AuthorizationService;
 import com.ddlabs.atlassian.api.PluginDaoRepository;
 import com.ddlabs.atlassian.config.UserService;
-import com.ddlabs.atlassian.model.MSConfig;
-import com.ddlabs.atlassian.remote.MetricServer;
+import com.ddlabs.atlassian.metrics.model.MSConfig;
+import com.ddlabs.atlassian.metrics.remote.MetricServer;
 import com.ddlabs.atlassian.util.HelperUtil;
 import com.ddlabs.atlassian.util.exceptions.NullOrEmptyFieldsException;
 import org.jetbrains.annotations.NotNull;
@@ -18,7 +18,6 @@ import javax.net.ssl.HttpsURLConnection;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.List;
@@ -97,6 +96,7 @@ public class OAuth2AuthorizationServiceImpl implements OAuth2AuthorizationServic
                 pluginDaoRepository.updateServerConfig(msConfig);
             } catch (Exception e) {
                 log.error("Failed to refresh access token for server: {}", serverType, e);
+                throw new Exception("Failed to refresh access token for server: " + serverType, e);
             }
         }
        // Get access token from the database or cache
@@ -117,17 +117,12 @@ public class OAuth2AuthorizationServiceImpl implements OAuth2AuthorizationServic
                     log.info("Refreshed access token for server: {}", newAccessToken);
                 } catch (Exception e) {
                     log.error("Failed to refresh access token for server: {}", config.getServerName(), e);
+                    throw new Exception("Failed to refresh access token for server: " + config.getServerName(), e);
                 }
             }
         }
 
     }
-
-    private boolean isAccessTokenExpired(Long accessTokenExpiry) {
-        Assert.notNull(accessTokenExpiry, "Access token expiry time cannot be null");
-        return Instant.now().getEpochSecond() >= accessTokenExpiry;
-    }
-
     /**
      * Builds the authorization access URL for exchanging the authorization code for an access token.
      *

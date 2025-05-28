@@ -1,8 +1,9 @@
-package com.ddlabs.atlassian.rest;
+package com.ddlabs.atlassian.metrics.rest;
 
 import com.ddlabs.atlassian.api.OAuth2AuthorizationService;
-import com.ddlabs.atlassian.remote.MetricServer;
-import com.ddlabs.atlassian.remote.MetricServerFactory;
+import com.ddlabs.atlassian.metrics.remote.MetricServer;
+import com.ddlabs.atlassian.metrics.remote.MetricServerFactory;
+import com.ddlabs.atlassian.metrics.remote.datadog.MetricsApiProvider;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
@@ -17,11 +18,11 @@ import javax.ws.rs.core.Response;
 @Path("/")
 public class MetricsApiClient {
     private final MetricServerFactory metricServerFactory;
-    private final OAuth2AuthorizationService oauth2AuthorizationService;
+    private final MetricsApiProvider metricsApiProvider;
     @Inject
-    public MetricsApiClient(MetricServerFactory metricServerFactory, OAuth2AuthorizationService oauth2AuthorizationService) {
+    public MetricsApiClient(MetricServerFactory metricServerFactory, MetricsApiProvider metricsApiProvider) {
         this.metricServerFactory = metricServerFactory;
-        this.oauth2AuthorizationService = oauth2AuthorizationService;
+        this.metricsApiProvider = metricsApiProvider;
     }
 
     @GET
@@ -30,8 +31,7 @@ public class MetricsApiClient {
     public Response request_authorization(@PathParam("serverType") String serverType, @Context HttpServletRequest req) {
         MetricServer metricServer = metricServerFactory.getMetricServer(serverType);
         try {
-            oauth2AuthorizationService.refreshToken(metricServer);
-            return Response.ok("ok").build();
+            return Response.ok(metricsApiProvider.getV1Api(serverType)).build();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

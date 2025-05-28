@@ -1,14 +1,14 @@
-package com.ddlabs.atlassian.rest;
+package com.ddlabs.atlassian.metrics.rest;
 
 
 import com.ddlabs.atlassian.config.UserService;
-import com.ddlabs.atlassian.model.ServerConfigBody;
-import com.ddlabs.atlassian.model.ServerType;
+import com.ddlabs.atlassian.metrics.model.ServerConfigBody;
+import com.ddlabs.atlassian.metrics.model.ServerType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.ddlabs.atlassian.remote.MetricServer;
-import com.ddlabs.atlassian.remote.MetricServerFactory;
-import com.ddlabs.atlassian.remote.datadog.DatadogMetricServer;
+import com.ddlabs.atlassian.metrics.remote.MetricServer;
+import com.ddlabs.atlassian.metrics.remote.MetricServerFactory;
+import com.ddlabs.atlassian.metrics.remote.datadog.DatadogMetricServer;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;

@@ -1,8 +1,7 @@
-package com.ddlabs.atlassian.remote;
+package com.ddlabs.atlassian.metrics.remote;
 
-
-import com.ddlabs.atlassian.model.ConfigDefaults;
-import com.ddlabs.atlassian.model.ServerConfigBody;
+import com.ddlabs.atlassian.metrics.model.ConfigDefaults;
+import com.ddlabs.atlassian.metrics.model.ServerConfigBody;
 import com.ddlabs.atlassian.util.exceptions.NullOrEmptyFieldsException;
 
 import javax.servlet.http.HttpServletRequest;

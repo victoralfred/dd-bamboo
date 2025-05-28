@@ -1,9 +1,7 @@
 package com.ddlabs.atlassian.auth;
-
-import com.ddlabs.atlassian.model.MSConfig;
+import com.ddlabs.atlassian.metrics.model.MSConfig;
 import net.java.ao.EntityManager;
 import net.java.ao.RawEntity;
-
 import java.beans.PropertyChangeListener;
 
 public class MSConfigTest implements MSConfig {

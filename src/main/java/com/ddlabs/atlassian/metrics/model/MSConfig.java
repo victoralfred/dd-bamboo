@@ -1,4 +1,4 @@
-package com.ddlabs.atlassian.model;
+package com.ddlabs.atlassian.metrics.model;
 import net.java.ao.Entity;
 
 public interface MSConfig extends Entity {

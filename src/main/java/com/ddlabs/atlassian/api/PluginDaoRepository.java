@@ -1,9 +1,9 @@
 package com.ddlabs.atlassian.api;
 
 import com.atlassian.activeobjects.tx.Transactional;
-import com.ddlabs.atlassian.model.ConfiguredMetricServers;
-import com.ddlabs.atlassian.model.MSConfig;
-import com.ddlabs.atlassian.model.ServerConfigProperties;
+import com.ddlabs.atlassian.metrics.model.ConfiguredMetricServers;
+import com.ddlabs.atlassian.metrics.model.MSConfig;
+import com.ddlabs.atlassian.metrics.model.ServerConfigProperties;
 
 import java.util.List;
 

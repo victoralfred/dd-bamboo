@@ -1,9 +1,8 @@
-package com.ddlabs.atlassian.remote;
+package com.ddlabs.atlassian.metrics.remote;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;

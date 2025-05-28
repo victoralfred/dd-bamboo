@@ -1,6 +1,7 @@
 package com.ddlabs.atlassian.api;
 
-import com.ddlabs.atlassian.remote.MetricServer;
+import com.atlassian.sal.core.util.Assert;
+import com.ddlabs.atlassian.metrics.remote.MetricServer;
 import com.ddlabs.atlassian.util.HelperUtil;
 import com.ddlabs.atlassian.util.exceptions.NullOrEmptyFieldsException;
 import org.jetbrains.annotations.NotNull;
@@ -9,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 
 
 public interface OAuth2AuthorizationService {
@@ -103,5 +105,8 @@ public interface OAuth2AuthorizationService {
      * @param metricServer The MetricServer instance representing the server for which the token needs to be refreshed.
      */
     void refreshToken(MetricServer metricServer) throws Exception;
-
+    default boolean isAccessTokenExpired(Long accessTokenExpiry) {
+        Assert.notNull(accessTokenExpiry, "Access token expiry time cannot be null");
+        return Instant.now().getEpochSecond() >= accessTokenExpiry;
+    }
 }
