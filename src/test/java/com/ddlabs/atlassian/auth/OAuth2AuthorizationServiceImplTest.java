@@ -2,103 +2,95 @@ package com.ddlabs.atlassian.auth;
 
 
 import com.ddlabs.atlassian.api.HttpConnectionFactory;
-import junit.framework.TestCase;
+import com.ddlabs.atlassian.api.PluginDaoRepository;
+import com.ddlabs.atlassian.config.UserService;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import javax.net.ssl.HttpsURLConnection;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.net.HttpURLConnection;
+import java.io.ByteArrayInputStream;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
-import static com.ddlabs.atlassian.model.ApplicationProperties.CONNECTION_TIMEOUT;
-import static com.ddlabs.atlassian.model.ApplicationProperties.READ_TIMEOUT;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.assertThrows;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
+class OAuth2AuthorizationServiceImplTest{
+    @Mock
+    private HttpConnectionFactory connectionFactory;
+    @Mock
+    private PluginDaoRepository pluginDaoRepository;
+    @Mock
+    private UserService userService;
+    @Mock
+    private HttpsURLConnection mockConnection;
+    @InjectMocks
+    private OAuth2AuthorizationServiceImpl authService;
+    private final String clientId = "clientId";
+    private final String clientSecret = "clientSecret";
+    private final String grantType = "authorization_code";
+    private final String codeVerifier = "codeVerifier";
+    private final String code = "authCode";
 
-public class OAuth2AuthorizationServiceImplTest {
-        //extends TestCase {
-//    private OAuth2AuthorizationService oauth2AuthorizationService;
-//    @Mock
-//    HttpsURLConnection mockedConnection;
-//    @Mock
-//    private HttpConnectionFactory mockFactory;
-//
-//    @Override
-//    public void setUp() {
-//        MockitoAnnotations.openMocks(this);
-//        oauth2AuthorizationService = new OAuth2AuthorizationServiceImpl(mockFactory);
-//    }
-//    public void testBuildAuthorizationUrl() {
-//        // Given
-//        String domain = "https://api.example.com";
-//        String clientId = "your_client_id";
-//        String redirectUri = "https://api.yourapp.com/callback";
-//        String responseType = "code";
-//        String code_challenge = "your_code_challenge";
-//        String codeChallengeMethod = "S256";
-//        // When
-//        String result = oauth2AuthorizationService.buildAuthorizationUrl(domain, clientId, redirectUri, responseType, code_challenge, codeChallengeMethod);
-//        // Then
-//        assertNotNull(result);
-//        assertTrue(result.startsWith(domain + "/oauth2/v1/authorize"));
-//    }
-//    public void testBuildAuthorizationUrlWithCodeChallengeMethod() {
-//        // Given
-//        String clientId = "your_client_id";
-//        String redirectUri = "https://api.yourapp.com/callback";
-//        String clientSecret = "your_client_secret";
-//        String code = "your_code";
-//        String codeVerifier = "your_code_verifier";
-//        URI tokenEndpoint = URI.create("https://api.example.com/token");
-//        String expectedUrlParameters = "client_id=" + URLEncoder.encode(clientId, StandardCharsets.UTF_8) +
-//                "&client_secret=" + URLEncoder.encode(clientSecret, StandardCharsets.UTF_8) +
-//                "&redirect_uri=" + redirectUri +
-//                "&code=" + URLEncoder.encode(code, StandardCharsets.UTF_8) +
-//                "&code_verifier=" + URLEncoder.encode(codeVerifier, StandardCharsets.UTF_8) +
-//                "&grant_type=authorization_code";
-//
-//        try{
-//            // Stub factory and connection
-//            ByteArrayOutputStream fakeOutputStream = new ByteArrayOutputStream();
-//            when(mockFactory.createConnection(tokenEndpoint, "POST", "application/x-www-form-urlencoded"))
-//                    .thenReturn(mockedConnection);
-//            when(mockedConnection.getOutputStream()).thenReturn(fakeOutputStream);
-//            when(mockedConnection.getResponseCode()).thenReturn(401);
-//            // When
-//            String actual = oauth2AuthorizationService.buildAuthorizationAccessURL(
-//                    clientId, clientSecret, redirectUri,code, codeVerifier);
-//            HttpURLConnection result = oauth2AuthorizationService.getUrlConnection(
-//                    tokenEndpoint,
-//                    actual,
-//                    "POST",
-//                    "application/x-www-form-urlencoded"
-//            );
-//            assertNotNull(mockedConnection);
-//            when(mockFactory.createConnection(tokenEndpoint,"POST",
-//                    "application/x-www-form-urlencoded")).thenReturn(mockedConnection);
-//
-//            when(mockedConnection.getOutputStream()).thenReturn(fakeOutputStream);
-//            when(mockedConnection.getResponseCode()).thenReturn(401);
-//            // Then
-//            assertNotNull(actual);
-//            assertEquals(expectedUrlParameters, actual);
-//            assertEquals(401, result.getResponseCode());
-//
-//            verify(mockedConnection).setDoOutput(true);
-//            verify(mockedConnection).setRequestMethod("POST");
-//            verify(mockedConnection).setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-//            verify(mockedConnection).setConnectTimeout(CONNECTION_TIMEOUT);
-//            verify(mockedConnection).setReadTimeout(READ_TIMEOUT);
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
-    public void voidTest() throws Exception {
-        System.out.println("Test is not implemented yet.");
+    @BeforeEach
+    public void setUp(){
+        MockitoAnnotations.openMocks(this);
+        authService = new OAuth2AuthorizationServiceImpl(connectionFactory, pluginDaoRepository, userService);
+    }
+    @Test
+    void testExchangeAuthorizationCodeForAccessToken_ReturnsAccessToken() throws Exception {
+       // GIVEN
+        String expectedResponse = "{\"access_token\":\"abc123\"}";
+        String tokenEndpoint = "https://example.com/token";
+        URI uri = new URI(tokenEndpoint);
+        // WHEN
+        when(connectionFactory.getUrlConnection(eq(uri), anyString(), eq("POST"), eq("application/x-www-form-urlencoded")))
+                .thenReturn(mockConnection);
+        when(mockConnection.getInputStream()).thenReturn(new ByteArrayInputStream(expectedResponse.getBytes(StandardCharsets.UTF_8)));
+        //THEN
+        String redirectUri = "https://example.com/redirect";
+        String result = authService.exchangeAuthorizationCodeForAccessToken(
+                redirectUri, clientId, clientSecret, grantType, codeVerifier, code, tokenEndpoint
+        );
+        // ASSERT
+        Assertions.assertEquals(expectedResponse, result);
+    }
+    @Test
+    void testConstAuthorizationCodeForAccessTokenUrl_ReturnsExpectedUrl() {
+        // GIVEN
+        String clientId = "myClient";
+        String clientSecret = "mySecret";
+        String redirectUri = "https://example.com/callback";
+        String code = "authCode123";
+        String codeVerifier = "codeVerifierXYZ";
+        //WHEN
+        String result = authService.constAuthorizationCodeForAccessTokenUrl(
+                clientId, clientSecret, redirectUri, code, codeVerifier
+        );
+        // THEN
+        Assertions.assertTrue(result.contains("client_id=" + URLEncoder.encode(clientId, StandardCharsets.UTF_8)));
+        Assertions.assertTrue(result.contains("client_secret=" + URLEncoder.encode(clientSecret, StandardCharsets.UTF_8)));
+        Assertions.assertTrue(result.contains("redirect_uri=" + redirectUri));
+        Assertions.assertTrue(result.contains("code=" + URLEncoder.encode(code, StandardCharsets.UTF_8)));
+        Assertions.assertTrue(result.contains("code_verifier=" + URLEncoder.encode(codeVerifier, StandardCharsets.UTF_8)));
+        Assertions.assertTrue(result.contains("grant_type=authorization_code"));
+    }
+    @Test
+    void testExchangeAuthorizationCodeForAccessToken_ThrowsRuntimeExceptionOnInvalidUri() {
+        // WHEN / THEN
+        assertThrows(RuntimeException.class,
+                () -> authService.exchangeAuthorizationCodeForAccessToken(
+                "invalid_uri", clientId, clientSecret,
+                        grantType, codeVerifier, code, "://"
+        ));
     }
 }

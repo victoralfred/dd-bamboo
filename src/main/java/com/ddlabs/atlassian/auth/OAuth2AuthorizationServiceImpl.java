@@ -70,35 +70,15 @@ public class OAuth2AuthorizationServiceImpl implements OAuth2AuthorizationServic
             throw new RuntimeException("Error exchanging authorization code for access token: " + e.getMessage(), e);
         }
     }
-
-    @Override
-    public String constAuthorizationCodeForAccessTokenUrl(@NotNull final String  clientId,
-                                                          @NotNull final String clientSecret,
-                                                          @NotNull final String redirectUri,
-                                                          @NotNull final String code,
-                                                          @NotNull final String codeVerifier) {
-        try{
-            HelperUtil.checkNotNullOrEmptyStrings(clientId,clientSecret,redirectUri,code,codeVerifier);
-            return "client_id=" + URLEncoder.encode(clientId, StandardCharsets.UTF_8) +
-                    "&client_secret=" + URLEncoder.encode(clientSecret, StandardCharsets.UTF_8) +
-                    "&redirect_uri=" + redirectUri +
-                    "&code=" + URLEncoder.encode(code, StandardCharsets.UTF_8) +
-                    "&code_verifier=" + URLEncoder.encode(codeVerifier, StandardCharsets.UTF_8) +
-                    "&grant_type=authorization_code";
-        }catch (NullOrEmptyFieldsException e ) {
-            throw new RuntimeException("Error building authorization code for access token URL: " + e.getMessage(), e);
-        }
-    }
     // Check if the access token is expired, and if so, retry a request to exchange new access token with refresh token
     @Override
     public void refreshToken(MetricServer metricServer) throws Exception {
         Assert.notNull(metricServer, "Server type cannot be null");
         String serverType = metricServer.getClass().getSimpleName();
-        // Get the server configuration from the database or cache
+        // Get the server configuration from the database
         // Get the class name of the MetricServer implementation
         MSConfig msConfig = pluginDaoRepository.getServerConfigByType(serverType);
         if (msConfig == null) {
-            Logger log = LoggerFactory.getLogger(OAuth2AuthorizationServiceImpl.class);
             log.warn("No configuration found for server: {}", serverType);
             return;
         }
@@ -116,7 +96,6 @@ public class OAuth2AuthorizationServiceImpl implements OAuth2AuthorizationServic
                 msConfig.setAccessToken(newAccessToken);
                 pluginDaoRepository.updateServerConfig(msConfig);
             } catch (Exception e) {
-                Logger log = LoggerFactory.getLogger(OAuth2AuthorizationServiceImpl.class);
                 log.error("Failed to refresh access token for server: {}", serverType, e);
             }
         }
@@ -137,7 +116,6 @@ public class OAuth2AuthorizationServiceImpl implements OAuth2AuthorizationServic
                     // Update the access token in the database or cache
                     log.info("Refreshed access token for server: {}", newAccessToken);
                 } catch (Exception e) {
-                    Logger log = LoggerFactory.getLogger(OAuth2AuthorizationServiceImpl.class);
                     log.error("Failed to refresh access token for server: {}", config.getServerName(), e);
                 }
             }
@@ -147,8 +125,7 @@ public class OAuth2AuthorizationServiceImpl implements OAuth2AuthorizationServic
 
     private boolean isAccessTokenExpired(Long accessTokenExpiry) {
         Assert.notNull(accessTokenExpiry, "Access token expiry time cannot be null");
-        long currentTimeMillis = Instant.now().getEpochSecond();
-        return currentTimeMillis >= accessTokenExpiry;
+        return Instant.now().getEpochSecond() >= accessTokenExpiry;
     }
 
     /**
@@ -169,5 +146,4 @@ public class OAuth2AuthorizationServiceImpl implements OAuth2AuthorizationServic
         return constAuthorizationCodeForAccessTokenUrl(clientId, clientSecret,
                 redirectUri, code, codeVerifier);
     }
-
 }

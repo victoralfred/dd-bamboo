@@ -1,6 +1,9 @@
 package com.ddlabs.atlassian.api;
 
 import com.ddlabs.atlassian.remote.MetricServer;
+import com.ddlabs.atlassian.util.HelperUtil;
+import com.ddlabs.atlassian.util.exceptions.NullOrEmptyFieldsException;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,8 +53,23 @@ public interface OAuth2AuthorizationService {
      * @param codeVerifier The code verifier.
      * @return The URL parameters as a string.
      */
-    String constAuthorizationCodeForAccessTokenUrl(String clientId, String clientSecret,
-                                                          String redirectUri, String code, String codeVerifier);
+    default String constAuthorizationCodeForAccessTokenUrl(@NotNull final String  clientId,
+                                                          @NotNull final String clientSecret,
+                                                          @NotNull final String redirectUri,
+                                                          @NotNull final String code,
+                                                          @NotNull final String codeVerifier) {
+        try{
+            HelperUtil.checkNotNullOrEmptyStrings(clientId,clientSecret,redirectUri,code,codeVerifier);
+            return "client_id=" + URLEncoder.encode(clientId, StandardCharsets.UTF_8) +
+                    "&client_secret=" + URLEncoder.encode(clientSecret, StandardCharsets.UTF_8) +
+                    "&redirect_uri=" + redirectUri +
+                    "&code=" + URLEncoder.encode(code, StandardCharsets.UTF_8) +
+                    "&code_verifier=" + URLEncoder.encode(codeVerifier, StandardCharsets.UTF_8) +
+                    "&grant_type=authorization_code";
+        }catch (NullOrEmptyFieldsException e ) {
+            throw new RuntimeException("Error building authorization code for access token URL: " + e.getMessage(), e);
+        }
+    }
     /**
      * Exchanges the authorization code for an access token.
      *
