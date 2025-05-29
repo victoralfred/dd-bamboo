@@ -52,15 +52,36 @@
             <scope>provided</scope>
         </dependency>
         
+        <!-- Spring dependencies -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>5.3.29</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-tx</artifactId>
+            <version>5.3.29</version>
+            <scope>provided</scope>
+        </dependency>
+        
+        <!-- Testing dependencies -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.13.1</version>
+            <version>4.13.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-junit-jupiter</artifactId>
+            <version>5.14.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
             <version>5.14.2</version>
             <scope>test</scope>
         </dependency>
@@ -71,6 +92,8 @@
             <version>${plugin.testrunner.version}</version>
             <scope>test</scope>
         </dependency>
+        
+        <!-- API and JSON handling -->
         <dependency>
             <groupId>javax.ws.rs</groupId>
             <artifactId>jsr311-api</artifactId>
@@ -83,6 +106,8 @@
             <version>2.10.1</version>
             <scope>provided</scope>
         </dependency>
+        
+        <!-- Atlassian dependencies -->
         <dependency>
             <groupId>com.atlassian.templaterenderer</groupId>
             <artifactId>atlassian-template-renderer-api</artifactId>
@@ -101,10 +126,26 @@
             <version>${ao.version}</version>
             <scope>test</scope>
         </dependency>
+        
+        <!-- Datadog API client -->
         <dependency>
             <groupId>com.datadoghq</groupId>
             <artifactId>datadog-api-client</artifactId>
             <version>2.24.0</version>
+            <scope>provided</scope>
+        </dependency>
+        
+        <!-- Validation and logging -->
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>24.0.1</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>2.0.9</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

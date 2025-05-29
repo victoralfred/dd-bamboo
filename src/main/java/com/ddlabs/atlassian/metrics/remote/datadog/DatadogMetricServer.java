@@ -1,109 +1,175 @@
 package com.ddlabs.atlassian.metrics.remote.datadog;
 
-import com.ddlabs.atlassian.api.OAuth2AuthorizationService;
-import com.ddlabs.atlassian.api.PluginDaoRepository;
 import com.ddlabs.atlassian.auth.OAuthPKCSCodeChallenge;
+import com.ddlabs.atlassian.auth.oauth2.model.OAuth2Configuration;
+import com.ddlabs.atlassian.auth.oauth2.model.OAuth2TokenResponse;
+import com.ddlabs.atlassian.auth.oauth2.service.OAuth2Service;
 import com.ddlabs.atlassian.config.UserService;
+import com.ddlabs.atlassian.data.dto.ServerConfigDTO;
+import com.ddlabs.atlassian.data.repository.ServerConfigRepository;
+import com.ddlabs.atlassian.exception.AuthenticationException;
+import com.ddlabs.atlassian.exception.ConfigurationException;
+import com.ddlabs.atlassian.exception.ErrorCode;
+import com.ddlabs.atlassian.exception.ValidationException;
+import com.ddlabs.atlassian.metrics.api.MetricsApiClient;
+import com.ddlabs.atlassian.metrics.api.factory.MetricsApiClientFactory;
 import com.ddlabs.atlassian.metrics.model.*;
 import com.ddlabs.atlassian.metrics.remote.MetricServer;
-import com.ddlabs.atlassian.util.HelperUtil;
-import com.ddlabs.atlassian.util.exceptions.NullOrEmptyFieldsException;
+import com.ddlabs.atlassian.util.LogUtils;
+import com.ddlabs.atlassian.util.ValidationUtils;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
 import javax.servlet.http.HttpServletRequest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
-import java.util.Objects;
-import com.ddlabs.atlassian.metrics.model.MSConfig;
 
-import static com.ddlabs.atlassian.util.HelperUtil.getJsonString;
-
+/**
+ * Datadog implementation of the MetricServer interface.
+ */
 @Component
 public class DatadogMetricServer implements MetricServer {
     private static final Logger log = LoggerFactory.getLogger(DatadogMetricServer.class);
     private static final String TOKEN_ENDPOINT = "https://api.datadoghq.com/oauth2/v1/token";
     private static final String GRANT_TYPE_AUTHORIZATION_CODE = "authorization_code";
-    private final OAuth2AuthorizationService auth2Authorization;
+    
+    private final OAuth2Service oauth2Service;
     private final UserService userService;
-    private final PluginDaoRepository pluginDao;
+    private final ServerConfigRepository serverConfigRepository;
     private final ServerBodyBuilder serverBodyBuilder;
-    public DatadogMetricServer(OAuth2AuthorizationService auth2Authorization,
+    private final MetricsApiClientFactory metricsApiClientFactory;
+    
+    public DatadogMetricServer(OAuth2Service oauth2Service,
                                UserService userService,
-                               PluginDaoRepository pluginDao,
-                               ServerBodyBuilder serverBodyBuilder) {
-        this.auth2Authorization = Objects.requireNonNull(auth2Authorization, "auth2Authorization must not be null");
-        this.userService = Objects.requireNonNull(userService, "userService must not be null");
-        this.pluginDao = Objects.requireNonNull(pluginDao, "pluginDao must not be null");
-        this.serverBodyBuilder = Objects.requireNonNull(serverBodyBuilder, "serverBodyBuilder must not be null");
+                               ServerConfigRepository serverConfigRepository,
+                               ServerBodyBuilder serverBodyBuilder,
+                               MetricsApiClientFactory metricsApiClientFactory) {
+        this.oauth2Service = ValidationUtils.validateNotNull(oauth2Service, "OAuth2Service cannot be null");
+        this.userService = ValidationUtils.validateNotNull(userService, "UserService cannot be null");
+        this.serverConfigRepository = ValidationUtils.validateNotNull(serverConfigRepository, "ServerConfigRepository cannot be null");
+        this.serverBodyBuilder = ValidationUtils.validateNotNull(serverBodyBuilder, "ServerBodyBuilder cannot be null");
+        this.metricsApiClientFactory = ValidationUtils.validateNotNull(metricsApiClientFactory, "MetricsApiClientFactory cannot be null");
     }
+    
     @Override
-    public String setupOauth2Authentication(String serverName) throws NullOrEmptyFieldsException {
+    public String setupOauth2Authentication(String serverName) throws ValidationException {
         try {
-            HelperUtil.checkNotNull(serverName, "serverName must not be null");
-            MSConfig config = pluginDao.getServerConfigByType(serverName);
+            ValidationUtils.validateNotEmpty(serverName, "Server name cannot be empty");
+            
+            ServerConfigDTO config = serverConfigRepository.findByServerType(serverName);
             if (config == null) {
-                log.error("No server configuration found for server: {}", serverName);
-                return null;
+                LogUtils.logError(log, "No server configuration found for server: " + serverName, null);
+                throw new ConfigurationException(ErrorCode.ENTITY_NOT_FOUND,
+                        "No server configuration found for server: " + serverName,
+                        "Server configuration not found");
             }
+            
             String codeChallenge = userService.decrypt(config.getCodeChallenge());
-            return auth2Authorization.buildAuthorizationUrl(
-                    config.getApiEndpoint(),
-                    config.getClientId(),
-                    config.getRedirectUrl(),
-                    "code",
-                    codeChallenge,
-                    "S256"
-            );
+            
+            OAuth2Configuration oauth2Config = new OAuth2Configuration();
+            oauth2Config.setApiEndpoint(config.getApiEndpoint());
+            oauth2Config.setAuthEndpoint(config.getOauthEndpoint());
+            oauth2Config.setClientId(config.getClientId());
+            oauth2Config.setRedirectUri(config.getRedirectUrl());
+            oauth2Config.setCodeChallenge(codeChallenge);
+            oauth2Config.setCodeChallengeMethod("S256");
+            
+            return oauth2Service.generateAuthorizationUrl(oauth2Config);
+        } catch (ConfigurationException | AuthenticationException e) {
+            throw e;
         } catch (Exception e) {
-            throw new NullOrEmptyFieldsException(e);
+            LogUtils.logError(log, "Error setting up OAuth2 authentication", e);
+            throw new ValidationException(
+                    "Error setting up OAuth2 authentication: " + e.getMessage(),
+                    "Failed to set up authentication");
         }
     }
 
     @Override
-    public String getAccessToken(HttpServletRequest req, String serverName) throws NullOrEmptyFieldsException{
+    public String getAccessToken(HttpServletRequest req, String serverName) throws ValidationException {
         try {
-            HelperUtil.checkNotNullOrEmptyStrings(serverName);
-            HelperUtil.checkNotNull(req);
-            MSConfig config = pluginDao.getServerConfigByType(serverName);
-            if (config == null || req.getParameter("code") == null) {
-                log.error("Missing configuration or authorization code.");
-                return null;
+            ValidationUtils.validateNotEmpty(serverName, "Server name cannot be empty");
+            ValidationUtils.validateNotNull(req, "HTTP request cannot be null");
+            
+            ServerConfigDTO config = serverConfigRepository.findByServerType(serverName);
+            if (config == null) {
+                LogUtils.logError(log, "No server configuration found for server: " + serverName, null);
+                throw new ConfigurationException(ErrorCode.ENTITY_NOT_FOUND,
+                        "No server configuration found for server: " + serverName,
+                        "Server configuration not found");
             }
-            return auth2Authorization.exchangeAuthorizationCodeForAccessToken(
-                    config.getRedirectUrl(),
-                    req.getParameter("client_id"),
-                    userService.decrypt(config.getClientSecret()),
-                    GRANT_TYPE_AUTHORIZATION_CODE,
-                    userService.decrypt(config.getCodeVerifier()),
-                    req.getParameter("code"),
-                    TOKEN_ENDPOINT
-            );
-        } catch (Exception ex) {
-            log.error("Error exchanging authorization code for access token: ", ex);
-            throw new NullOrEmptyFieldsException(ex);
+            
+            String code = req.getParameter("code");
+            if (code == null) {
+                LogUtils.logError(log, "Missing authorization code", null);
+                throw new ValidationException(
+                        "Missing authorization code",
+                        "Authorization code is required");
+            }
+            
+            OAuth2Configuration oauth2Config = new OAuth2Configuration();
+            oauth2Config.setTokenEndpoint(TOKEN_ENDPOINT);
+            oauth2Config.setClientId(req.getParameter("client_id"));
+            oauth2Config.setClientSecret(userService.decrypt(config.getClientSecret()));
+            oauth2Config.setRedirectUri(config.getRedirectUrl());
+            oauth2Config.setCodeVerifier(userService.decrypt(config.getCodeVerifier()));
+            
+            OAuth2TokenResponse tokenResponse = oauth2Service.exchangeCodeForTokens(code, oauth2Config);
+            
+            // Convert the token response to a string format for backward compatibility
+            JsonObject jsonResponse = new JsonObject();
+            jsonResponse.addProperty("access_token", tokenResponse.getAccessToken());
+            jsonResponse.addProperty("refresh_token", tokenResponse.getRefreshToken());
+            jsonResponse.addProperty("token_type", tokenResponse.getTokenType());
+            jsonResponse.addProperty("scope", tokenResponse.getScope());
+            jsonResponse.addProperty("expires_in", tokenResponse.getExpiresIn());
+            
+            return jsonResponse.toString();
+        } catch (ConfigurationException | AuthenticationException | ValidationException e) {
+            throw e;
+        } catch (Exception e) {
+            LogUtils.logError(log, "Error exchanging authorization code for access token", e);
+            throw new ValidationException(
+                    "Error exchanging authorization code for access token: " + e.getMessage(),
+                    "Failed to get access token");
         }
     }
+    
     @Override
-    public String saveServerMetadata(String serverType, String response, HttpServletRequest req) throws
-    NullOrEmptyFieldsException{
+    public String saveServerMetadata(String serverType, String response, HttpServletRequest req) throws ValidationException {
         try {
-            HelperUtil.checkNotNullOrEmptyStrings(serverType,response);
-            HelperUtil.checkNotNull(req);
+            ValidationUtils.validateNotEmpty(serverType, "Server type cannot be empty");
+            ValidationUtils.validateNotEmpty(response, "Response cannot be empty");
+            ValidationUtils.validateNotNull(req, "HTTP request cannot be null");
+            
             JsonObject json = JsonParser.parseString(response).getAsJsonObject();
             int expiresIn = json.get("expires_in").getAsInt();
-            MSConfig config = pluginDao.getServerConfigByType(serverType);
-            HelperUtil.checkNotNull(config);
+            
+            ServerConfigDTO config = serverConfigRepository.findByServerType(serverType);
+            if (config == null) {
+                LogUtils.logError(log, "No server configuration found for server: " + serverType, null);
+                throw new ConfigurationException(ErrorCode.ENTITY_NOT_FOUND,
+                        "No server configuration found for server: " + serverType,
+                        "Server configuration not found");
+            }
+            
             updateServerConfigFromResponse(config, json, req, expiresIn);
-            pluginDao.updateServerConfig(config);
+            serverConfigRepository.update(config);
+            
             return "success";
+        } catch (ConfigurationException e) {
+            throw e;
         } catch (Exception e) {
-            log.error("Failed to parse or process response: ", e);
-            throw new NullOrEmptyFieldsException(e);
+            LogUtils.logError(log, "Failed to parse or process response", e);
+            throw new ValidationException(
+                    "Failed to parse or process response: " + e.getMessage(),
+                    "Failed to save server metadata");
         }
     }
+    
     @Override
     public ConfigDefaults getConfigDefaults() {
         return new ConfigDefaults(
@@ -113,61 +179,104 @@ public class DatadogMetricServer implements MetricServer {
                 "http://localhost:6990/bamboo/rest/metrics/1.0/token"
         );
     }
+    
     @Override
-    public String saveServer(ServerConfigBody serverConfig)
-            throws NullOrEmptyFieldsException {
+    public String saveServer(ServerConfigBody serverConfig) throws ValidationException {
         try {
-            HelperUtil.checkNotNull(serverConfig);
+            ValidationUtils.validateNotNull(serverConfig, "Server config cannot be null");
+            
             ServerConfigProperties properties = prepareServerProperties(serverConfig);
-            HelperUtil.checkNotNull(properties);
-            return pluginDao.saveServerConfig(properties);
-        } catch (NoSuchAlgorithmException|NullOrEmptyFieldsException e) {
-            log.error("Error generating code challenge for server config", e);
-            throw new NullOrEmptyFieldsException(e);
+            ValidationUtils.validateNotNull(properties, "Server properties cannot be null");
+            
+            ServerConfigDTO configDTO = new ServerConfigDTO();
+            configDTO.setServerType(properties.getServerType());
+            configDTO.setServerName(properties.getServerName());
+            configDTO.setDescription(properties.getDescription());
+            configDTO.setClientId(properties.getClientId());
+            configDTO.setClientSecret(properties.getClientSecret());
+            configDTO.setRedirectUrl(properties.getRedirectUrl());
+            configDTO.setCodeVerifier(properties.getCodeVerifier());
+            configDTO.setCodeChallenge(properties.getCodeChallenge());
+            configDTO.setCodeCreationTime(properties.getCodeCreationTime());
+            configDTO.setCodeExpirationTime(properties.getCodeExpirationTime());
+            configDTO.setConfigured(false);
+            configDTO.setEnabled(false);
+            configDTO.setApiEndpoint(properties.getApiEndpoint());
+            configDTO.setOauthEndpoint(properties.getOauthEndpoint());
+            configDTO.setTokenEndpoint(properties.getTokenEndpoint());
+            
+            serverConfigRepository.save(configDTO);
+            
+            return "Server configuration saved successfully.";
+        } catch (Exception e) {
+            LogUtils.logError(log, "Error generating code challenge for server config", e);
+            throw new ValidationException(
+                    "Error saving server configuration: " + e.getMessage(),
+                    "Failed to save server configuration");
         }
     }
-
-
-    private void updateServerConfigFromResponse(MSConfig config, JsonObject json, HttpServletRequest req, int expiresIn)
-    throws NullOrEmptyFieldsException {
-        try{
-            HelperUtil.checkNotNull(config, json, req, expiresIn);
-            config.setAccessToken(getJsonString(json, "access_token"));
-            config.setRefreshToken(getJsonString(json, "refresh_token"));
-            config.setTokenType(getJsonString(json, "token_type"));
-            config.setScope(getJsonString(json, "scope"));
-            config.setAccessTokenExpiry(Instant.now().plusSeconds(expiresIn).getEpochSecond());
-            config.setConfigured(true);
-            config.setEnabled(true);
-            config.setSite(req.getParameter("site"));
-            config.setDomain(req.getParameter("domain"));
-            config.setOrgId(req.getParameter("dd_oid"));
-            config.setOrgName(req.getParameter("dd_org_name"));
-        }catch (NullOrEmptyFieldsException exception){
-            log.error("Null or empty fields in server response: ", exception);
-            throw new NullOrEmptyFieldsException(exception);
-        }
-
+    
+    /**
+     * Gets a MetricsApiClient for the Datadog server.
+     *
+     * @return The MetricsApiClient
+     * @throws ConfigurationException If an error occurs
+     */
+    public MetricsApiClient getMetricsApiClient() throws ConfigurationException {
+        return metricsApiClientFactory.createClient(getClass().getSimpleName());
     }
+    
+    private void updateServerConfigFromResponse(ServerConfigDTO config, JsonObject json, HttpServletRequest req, int expiresIn) {
+        ValidationUtils.validateNotNull(config, "Config cannot be null");
+        ValidationUtils.validateNotNull(json, "JSON response cannot be null");
+        ValidationUtils.validateNotNull(req, "HTTP request cannot be null");
+        
+        String accessToken = getJsonString(json, "access_token");
+        String refreshToken = getJsonString(json, "refresh_token");
+        String tokenType = getJsonString(json, "token_type");
+        String scope = getJsonString(json, "scope");
+        
+        ValidationUtils.validateNotEmpty(accessToken, "Access token cannot be empty");
+        ValidationUtils.validateNotEmpty(refreshToken, "Refresh token cannot be empty");
+        
+        config.setAccessToken(accessToken);
+        config.setRefreshToken(refreshToken);
+        config.setTokenType(tokenType);
+        config.setScope(scope);
+        config.setAccessTokenExpiry(Instant.now().plusSeconds(expiresIn).getEpochSecond());
+        config.setConfigured(true);
+        config.setEnabled(true);
+        config.setSite(req.getParameter("site"));
+        config.setDomain(req.getParameter("domain"));
+        config.setOrgId(req.getParameter("dd_oid"));
+        config.setOrgName(req.getParameter("dd_org_name"));
+    }
+    
     private ServerConfigProperties prepareServerProperties(ServerConfigBody serverConfig)
-            throws NoSuchAlgorithmException, NullOrEmptyFieldsException {
-    try {
-        HelperUtil.checkNotNull(serverConfig);
+            throws NoSuchAlgorithmException, ValidationException {
+        ValidationUtils.validateNotNull(serverConfig, "Server config cannot be null");
+        
         final long CODE_VALIDITY_DURATION_SECONDS = 36 * 1000L;
         ServerConfigProperties properties = serverBodyBuilder.apply(serverConfig);
+        
         String codeVerifier = OAuthPKCSCodeChallenge.generateCodeVerifier();
         String codeChallenge = OAuthPKCSCodeChallenge.generateCodeChallenge(codeVerifier);
         Instant now = Instant.now();
+        
         properties.setCodeVerifier(userService.encrypt(codeVerifier));
         properties.setCodeChallenge(userService.encrypt(codeChallenge));
         properties.setClientSecret(userService.encrypt(properties.getClientSecret()));
         properties.setCodeCreationTime(now.toEpochMilli());
         properties.setCodeExpirationTime(now.plusSeconds(CODE_VALIDITY_DURATION_SECONDS).getEpochSecond());
-        log.info("Prepared server properties for client ID: {}", properties.getClientId());
+        
+        LogUtils.logInfo(log, "Prepared server properties for client ID: {}", properties.getClientId());
         return properties;
-    }catch (NullOrEmptyFieldsException exception){
-            log.error("Null or empty fields in server response: ", exception);
-            throw new NullOrEmptyFieldsException(exception);
+    }
+    
+    private String getJsonString(JsonObject json, String key) {
+        if (!json.has(key) || json.get(key).isJsonNull()) {
+            return null;
         }
+        return json.get(key).getAsString();
     }
 }
