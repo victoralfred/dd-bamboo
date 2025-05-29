@@ -19,6 +19,8 @@ import java.time.Instant;
 import java.util.Objects;
 import com.ddlabs.atlassian.metrics.model.MSConfig;
 
+import static com.ddlabs.atlassian.util.HelperUtil.getJsonString;
+
 @Component
 public class DatadogMetricServer implements MetricServer {
     private static final Logger log = LoggerFactory.getLogger(DatadogMetricServer.class);
@@ -125,18 +127,13 @@ public class DatadogMetricServer implements MetricServer {
         }
     }
 
-    private String getJsonString(JsonObject json, String key) {
-        if (!json.has(key) || json.get(key).isJsonNull()) {
-            throw new IllegalArgumentException("Missing or null key in JSON: " + key);
-        }
-        return json.get(key).getAsString();
-    }
+
     private void updateServerConfigFromResponse(MSConfig config, JsonObject json, HttpServletRequest req, int expiresIn)
     throws NullOrEmptyFieldsException {
         try{
             HelperUtil.checkNotNull(config, json, req, expiresIn);
-            config.setAccessToken(userService.encrypt(getJsonString(json, "access_token")));
-            config.setRefreshToken(userService.encrypt(getJsonString(json, "refresh_token")));
+            config.setAccessToken(getJsonString(json, "access_token"));
+            config.setRefreshToken(getJsonString(json, "refresh_token"));
             config.setTokenType(getJsonString(json, "token_type"));
             config.setScope(getJsonString(json, "scope"));
             config.setAccessTokenExpiry(Instant.now().plusSeconds(expiresIn).getEpochSecond());

@@ -146,8 +146,12 @@
                             sun.misc,
                             com.datadog.api.client,
                             com.datadog.api.client.v2.api,
+                            com.datadog.api.client.v1.api,
                             com.datadog.api.client.v2.model,
-                            com.datadog.api.client.v2.model.MetricPayload
+                            com.datadog.api.client.v2.model.MetricPayload,
+                            com.datadog.api.client.ApiClient,
+                            com.datadog.api.client.v1.api.MetricsApi,
+                            com.datadog.api.client.v2.api.MetricsApi,
                         </Export-Package>
 
                         <!-- Add package import here -->
@@ -155,6 +159,8 @@
                             org.springframework.osgi.*;resolution:="optional",
                             org.eclipse.gemini.blueprint.*;resolution:="optional",
                             javax.ws.rs,
+                            com.datadog.api.client.ApiClient,
+                            com.datadog.api.client.v1.api.MetricsApi,
                             com.atlassian.activeobjects.external.ActiveObjects,
                             com.datadog.api.client.v2.*;resolution:="optional",
                             *,

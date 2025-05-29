@@ -45,6 +45,7 @@ public interface OAuth2AuthorizationService {
                 "&client_id=" + URLEncoder.encode(clientKey, StandardCharsets.UTF_8) +
                 "&client_secret=" + URLEncoder.encode(clientSecrete, StandardCharsets.UTF_8);
     }
+
     /**
      * Constructs the URL parameters for the authorization code exchange.
      *
@@ -97,7 +98,7 @@ public interface OAuth2AuthorizationService {
      * @param tokenEndpoint    The endpoint of the authorization server.
      * @return The access token response as a string.
      */
-    String exchangeAuthorizationCodeForAccessToken(String grantType, String refreshToken,  String clientKey,
+    String exchangeRefreshTokenForAccessToken(String grantType, String refreshToken,  String clientKey,
                                                    String clientSecrete, String tokenEndpoint) throws Exception;
 
     /**

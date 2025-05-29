@@ -1,6 +1,7 @@
 package com.ddlabs.atlassian.util;
 
 import com.ddlabs.atlassian.util.exceptions.NullOrEmptyFieldsException;
+import com.google.gson.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,5 +31,11 @@ public class HelperUtil {
                         new NullPointerException("Object value at index " + i + " is null"));
             }
         }
+    }
+    public static String getJsonString(JsonObject json, String key) {
+        if (!json.has(key) || json.get(key).isJsonNull()) {
+            throw new IllegalArgumentException("Missing or null key in JSON: " + key);
+        }
+        return json.get(key).getAsString();
     }
 }

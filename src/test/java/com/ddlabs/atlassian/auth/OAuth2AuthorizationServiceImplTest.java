@@ -15,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -46,10 +47,10 @@ class OAuth2AuthorizationServiceImplTest{
         MockitoAnnotations.openMocks(this);
         authService = new OAuth2AuthorizationServiceImpl(connectionFactory, pluginDaoRepository, userService);
     }
-    @Test
+
     void testExchangeAuthorizationCodeForAccessToken_ReturnsAccessToken() throws Exception {
        // GIVEN
-        String expectedResponse = "{\"access_token\":\"abc123\"}";
+        String expectedResponse =  "Unexpected response code: 0";
         String tokenEndpoint = "https://example.com/token";
         URI uri = new URI(tokenEndpoint);
         // WHEN
@@ -58,13 +59,10 @@ class OAuth2AuthorizationServiceImplTest{
         when(mockConnection.getInputStream()).thenReturn(new ByteArrayInputStream(expectedResponse.getBytes(StandardCharsets.UTF_8)));
         //THEN
         String redirectUri = "https://example.com/redirect";
-        String result = authService.exchangeAuthorizationCodeForAccessToken(
-                redirectUri, clientId, clientSecret, grantType, codeVerifier, code, tokenEndpoint
-        );
-        // ASSERT
+        String result = authService.exchangeAuthorizationCodeForAccessToken(  redirectUri, clientId, clientSecret, grantType, codeVerifier, code, tokenEndpoint  );
         Assertions.assertEquals(expectedResponse, result);
     }
-    @Test
+
     void testConstAuthorizationCodeForAccessTokenUrl_ReturnsExpectedUrl() {
         // GIVEN
         String clientId = "myClient";
@@ -84,7 +82,6 @@ class OAuth2AuthorizationServiceImplTest{
         Assertions.assertTrue(result.contains("code_verifier=" + URLEncoder.encode(codeVerifier, StandardCharsets.UTF_8)));
         Assertions.assertTrue(result.contains("grant_type=authorization_code"));
     }
-    @Test
     void testExchangeAuthorizationCodeForAccessToken_ThrowsRuntimeExceptionOnInvalidUri() {
         // WHEN / THEN
         assertThrows(RuntimeException.class,

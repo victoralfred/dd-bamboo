@@ -41,11 +41,7 @@
 
     <ao key="ao-module">
         <description>Active Objects service used by this Metrics Server configuration</description>
-        <entity>com.ddlabs.atlassian.model.MSConfig</entity>
-        <upgradeTask>com.ddlabs.atlassian.model.MetricsAOUpgradeTask001</upgradeTask>
+        <entity>com.ddlabs.atlassian.metrics.model.MSConfig</entity>
+        <upgradeTask>com.ddlabs.atlassian.metrics.model.MetricsAOUpgradeTask001</upgradeTask>
     </ao>
-    <job-config name="My job" key="triggerOAuthTokenRefresh">
-        <job key="triggerOAuthTokenRefresh" perClusterJob="true" clusteredOnly="false"/>
-        <schedule repeat-interval="3600" repeat-count="5"/>
-    </job-config>
 </atlassian-plugin>

@@ -1,9 +1,12 @@
-package com.ddlabs.atlassian.metrics.rest;
+package com.ddlabs.atlassian.rest;
 
 
+import com.ddlabs.atlassian.api.OAuth2AuthorizationService;
+import com.ddlabs.atlassian.api.PluginDaoRepository;
 import com.ddlabs.atlassian.config.UserService;
 import com.ddlabs.atlassian.metrics.model.ServerConfigBody;
 import com.ddlabs.atlassian.metrics.model.ServerType;
+import com.ddlabs.atlassian.metrics.remote.datadog.MetricsApiProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.ddlabs.atlassian.metrics.remote.MetricServer;
@@ -23,11 +26,15 @@ public class Oauth2ApiClient {
     private static final Logger log = LoggerFactory.getLogger(Oauth2ApiClient.class);
     private final MetricServerFactory metricServerFactory;
     private final UserService userService;
+    private  final MetricsApiProvider metricsApiProvider;
     @Inject
     public Oauth2ApiClient(MetricServerFactory metricServerFactory,
-                           UserService userService) {
+                           UserService userService, OAuth2AuthorizationService authService,
+                           MetricServerFactory serverFactory,
+                           PluginDaoRepository pluginDao) {
         this.metricServerFactory = metricServerFactory;
         this.userService = userService;
+        this.metricsApiProvider = new MetricsApiProvider(authService, serverFactory, pluginDao);
     }
     @GET
     @Path("authorize/{serverType}")
@@ -51,7 +58,7 @@ public class Oauth2ApiClient {
         return Response.temporaryRedirect(URI.create("http://localhost:6990/bamboo/plugins/servlet/metrics")).build();
     }
     @POST
-    @Path("/save")
+    @Path("save")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response saveServer(ServerConfigBody serverConfig,
                                @Context HttpServletRequest req){
@@ -67,6 +74,18 @@ public class Oauth2ApiClient {
         userService.isAuthenticatedUserAndAdmin();
         MetricServer metricServer = metricServerFactory.getMetricServer(serverType.getServerType());
         return Response.ok(metricServer.getConfigDefaults()).build();
+    }
+    @GET
+    @Path("kpi/{serverType}")
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response request_KPI(@PathParam("serverType") String serverType, @Context HttpServletRequest req) {
+        MetricServer metricServer = metricServerFactory.getMetricServer(serverType);
+        try {
+            return Response.ok(metricsApiProvider.configureAccessToken(serverType)).build();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
     }
     /**
      * Extracts the server type from the provided server URL.

@@ -18,7 +18,7 @@ public interface HttpConnectionFactory {
      * @return The HttpsURLConnection object.
      * @throws IOException If an I/O error occurs.
      */
-    HttpURLConnection openHttpsConnection(URI uri, String urlParameters,
+    HttpsURLConnection openHttpsConnection(URI uri, String urlParameters,
                                          String method, String mediaType) throws IOException;
      /**
      * Creates a new HttpsURLConnection instance for the given URI.
