@@ -6,6 +6,7 @@ import com.ddlabs.atlassian.util.LogUtils;
 import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.IOException;
@@ -21,6 +22,7 @@ import java.util.Map;
 /**
  * Default implementation of the HTTP client interface.
  */
+@Component
 public class DefaultHttpClient implements HttpClient {
     private static final Logger log = LoggerFactory.getLogger(DefaultHttpClient.class);
     private static final int DEFAULT_TIMEOUT_MS = 30000; // 30 seconds
@@ -99,17 +101,13 @@ public class DefaultHttpClient implements HttpClient {
     
     private String handleResponse(HttpsURLConnection connection) throws IOException, ApiException {
         int statusCode = connection.getResponseCode();
-        Map<String, String> headers = extractHeaders(connection);
-        
         if (statusCode >= 200 && statusCode < 300) {
             return new String(connection.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
         } else {
             String errorBody = new String(connection.getErrorStream().readAllBytes(), StandardCharsets.UTF_8);
             LogUtils.logWarning(log, "HTTP request failed with status code {}: {}", statusCode, errorBody);
-            
             ErrorCode errorCode;
             String userMessage;
-            
             switch (statusCode) {
                 case 400:
                     errorCode = ErrorCode.API_ERROR;
@@ -142,8 +140,8 @@ public class DefaultHttpClient implements HttpClient {
                     errorCode = ErrorCode.API_ERROR;
                     userMessage = "Unexpected error";
             }
-            
-            throw new ApiException(errorCode, 
+
+            throw new ApiException(errorCode,
                     "HTTP request failed with status code " + statusCode + ": " + errorBody, 
                     userMessage);
         }

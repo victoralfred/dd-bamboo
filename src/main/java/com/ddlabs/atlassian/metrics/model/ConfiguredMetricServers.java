@@ -1,38 +1,67 @@
 package com.ddlabs.atlassian.metrics.model;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 public class ConfiguredMetricServers implements Serializable {
+    @Serial
     private static final long serialVersionUID = 89800000L;
-    private String name;
     private boolean online;
     private boolean authentication;
     private String serverType;
+    private String serverName;
+    private boolean configured;
+    private boolean enabled;
+    private String description;
 
-    public ConfiguredMetricServers() {
-    }
-
-    public ConfiguredMetricServers(String name, boolean online, boolean authentication, String serverType) {
-        this.name = name;
+    public ConfiguredMetricServers(String serverName, boolean online, boolean authentication, String serverType,  boolean configured, boolean enabled, String description) {
         this.online = online;
         this.authentication = authentication;
         this.serverType = serverType;
+        this.serverName = serverName;
+        this.configured = configured;
+        this.enabled = enabled;
+        this.description = description;
     }
 
-    public String getName() {
-        return name;
+    public String getDescription() {
+        return description;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public boolean isOnline() {
-        return online;
+    public boolean isEnabled() {
+        return enabled;
     }
 
-    public void setOnline(boolean online) {
-        this.online = online;
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    public boolean isConfigured() {
+        return configured;
+    }
+
+    public void setConfigured(boolean configured) {
+        this.configured = configured;
+    }
+
+    public String getServerName() {
+        return serverName;
+    }
+
+    public void setServerName(String serverName) {
+        this.serverName = serverName;
+    }
+
+    public String getServerType() {
+        return serverType;
+    }
+
+    public void setServerType(String serverType) {
+        this.serverType = serverType;
     }
 
     public boolean isAuthentication() {
@@ -43,10 +72,11 @@ public class ConfiguredMetricServers implements Serializable {
         this.authentication = authentication;
     }
 
-    public String getServerType() {
-        return serverType;
+    public boolean isOnline() {
+        return online;
     }
-    public void setServerType(String serverType) {
-        this.serverType = serverType;
+
+    public void setOnline(boolean online) {
+        this.online = online;
     }
 }

@@ -44,7 +44,6 @@ public class Oauth2ApiClient {
         MetricServer metricServer = metricServerFactory.getMetricServer(serverType);
             final String oauth_request_url =  metricServer.setupOauth2Authentication(serverType);
             return oauth_request_url!=null?Response.ok(oauth_request_url).build(): Response.serverError().build();
-
     }
     @GET
     @Path("token")
@@ -79,7 +78,6 @@ public class Oauth2ApiClient {
     @Path("kpi/{serverType}")
     @Produces(MediaType.TEXT_PLAIN)
     public Response request_KPI(@PathParam("serverType") String serverType, @Context HttpServletRequest req) {
-        MetricServer metricServer = metricServerFactory.getMetricServer(serverType);
         try {
             return Response.ok(metricsApiProvider.configureAccessToken(serverType)).build();
         } catch (Exception e) {

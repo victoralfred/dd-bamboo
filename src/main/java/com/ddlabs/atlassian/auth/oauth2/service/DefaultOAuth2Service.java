@@ -3,18 +3,16 @@ package com.ddlabs.atlassian.auth.oauth2.service;
 import com.ddlabs.atlassian.auth.oauth2.model.GrantType;
 import com.ddlabs.atlassian.auth.oauth2.model.OAuth2Configuration;
 import com.ddlabs.atlassian.auth.oauth2.model.OAuth2TokenResponse;
-import com.ddlabs.atlassian.auth.oauth2.model.TokenRequest;
-import com.ddlabs.atlassian.exception.ApiException;
 import com.ddlabs.atlassian.exception.AuthenticationException;
 import com.ddlabs.atlassian.exception.ErrorCode;
 import com.ddlabs.atlassian.http.HttpClient;
 import com.ddlabs.atlassian.util.LogUtils;
 import com.ddlabs.atlassian.util.ValidationUtils;
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -23,15 +21,14 @@ import java.time.Instant;
 /**
  * Default implementation of the OAuth2 service interface.
  */
+@Component
 public class DefaultOAuth2Service implements OAuth2Service {
     private static final Logger log = LoggerFactory.getLogger(DefaultOAuth2Service.class);
     
     private final HttpClient httpClient;
-    private final Gson gson;
-    
+
     public DefaultOAuth2Service(HttpClient httpClient) {
         this.httpClient = httpClient;
-        this.gson = new Gson();
     }
     
     @Override
@@ -80,11 +77,6 @@ public class DefaultOAuth2Service implements OAuth2Service {
             
             String response = httpClient.post(config.getTokenEndpoint(), requestBody, "application/x-www-form-urlencoded");
             return parseTokenResponse(response);
-        } catch (ApiException e) {
-            LogUtils.logError(log, "Error exchanging authorization code for tokens", e);
-            throw new AuthenticationException(ErrorCode.TOKEN_EXCHANGE_FAILED, 
-                    "Error exchanging authorization code for tokens: " + e.getMessage(), 
-                    "Failed to exchange authorization code for tokens", e);
         } catch (Exception e) {
             LogUtils.logError(log, "Error exchanging authorization code for tokens", e);
             throw new AuthenticationException(ErrorCode.TOKEN_EXCHANGE_FAILED, 
@@ -92,35 +84,7 @@ public class DefaultOAuth2Service implements OAuth2Service {
                     "Failed to exchange authorization code for tokens", e);
         }
     }
-    
-    @Override
-    public OAuth2TokenResponse refreshAccessToken(String refreshToken, OAuth2Configuration config) throws AuthenticationException {
-        try {
-            ValidationUtils.validateNotEmpty(refreshToken, "Refresh token cannot be empty");
-            ValidationUtils.validateNotNull(config, "OAuth2 configuration cannot be null");
-            ValidationUtils.validateNotEmpty(config.getTokenEndpoint(), "Token endpoint cannot be empty");
-            ValidationUtils.validateNotEmpty(config.getClientId(), "Client ID cannot be empty");
-            ValidationUtils.validateNotEmpty(config.getClientSecret(), "Client secret cannot be empty");
-            
-            String requestBody = "client_id=" + URLEncoder.encode(config.getClientId(), StandardCharsets.UTF_8) +
-                    "&client_secret=" + URLEncoder.encode(config.getClientSecret(), StandardCharsets.UTF_8) +
-                    "&refresh_token=" + URLEncoder.encode(refreshToken, StandardCharsets.UTF_8) +
-                    "&grant_type=" + GrantType.REFRESH_TOKEN.getValue();
-            
-            String response = httpClient.post(config.getTokenEndpoint(), requestBody, "application/x-www-form-urlencoded");
-            return parseTokenResponse(response);
-        } catch (ApiException e) {
-            LogUtils.logError(log, "Error refreshing access token", e);
-            throw new AuthenticationException(ErrorCode.TOKEN_REFRESH_FAILED, 
-                    "Error refreshing access token: " + e.getMessage(), 
-                    "Failed to refresh access token", e);
-        } catch (Exception e) {
-            LogUtils.logError(log, "Error refreshing access token", e);
-            throw new AuthenticationException(ErrorCode.TOKEN_REFRESH_FAILED, 
-                    "Error refreshing access token: " + e.getMessage(), 
-                    "Failed to refresh access token", e);
-        }
-    }
+
     
     @Override
     public boolean isAccessTokenExpired(long accessTokenExpiry) {

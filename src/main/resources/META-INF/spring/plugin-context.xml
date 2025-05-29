@@ -2,42 +2,9 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:atlassian-scanner="http://www.atlassian.com/schema/atlassian-scanner/2"
-       xmlns:context="http://www.springframework.org/schema/context"
-       xmlns:tx="http://www.springframework.org/schema/tx"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
         http://www.springframework.org/schema/beans/spring-beans.xsd
         http://www.atlassian.com/schema/atlassian-scanner
-        http://www.atlassian.com/schema/atlassian-scanner/atlassian-scanner.xsd
-        http://www.springframework.org/schema/context
-        http://www.springframework.org/schema/context/spring-context.xsd
-        http://www.springframework.org/schema/tx
-        http://www.springframework.org/schema/tx/spring-tx.xsd">
-        
-    <!-- Enable component scanning for the refactored packages -->
-    <context:component-scan base-package="com.ddlabs.atlassian.auth.oauth2"/>
-    <context:component-scan base-package="com.ddlabs.atlassian.data"/>
-    <context:component-scan base-package="com.ddlabs.atlassian.http"/>
-    <context:component-scan base-package="com.ddlabs.atlassian.metrics.api"/>
-    
-    <!-- Enable transaction management -->
-    <tx:annotation-driven/>
-    
-    <!-- Use scanner for Atlassian components -->
+        http://www.atlassian.com/schema/atlassian-scanner/atlassian-scanner.xsd">
     <atlassian-scanner:scan-indexes/>
-    
-    <!-- HTTP Client bean -->
-    <bean id="httpClient" class="com.ddlabs.atlassian.http.DefaultHttpClient"/>
-    
-    <!-- OAuth2 Service bean -->
-    <bean id="oauth2Service" class="com.ddlabs.atlassian.auth.oauth2.service.DefaultOAuth2Service">
-        <constructor-arg ref="httpClient"/>
-    </bean>
-    
-    <!-- Server Config Mapper bean -->
-    <bean id="serverConfigMapper" class="com.ddlabs.atlassian.data.mapper.ServerConfigMapper"/>
-    
-    <!-- Adapter for backward compatibility -->
-    <bean id="pluginDaoRepositoryAdapter" class="com.ddlabs.atlassian.data.adapter.PluginDaoRepositoryAdapter">
-        <constructor-arg ref="serverConfigRepository"/>
-    </bean>
 </beans>

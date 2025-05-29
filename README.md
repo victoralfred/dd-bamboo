@@ -14,3 +14,5 @@ First save the Metric server.
 Popup a modal for the authentication process
 If successful, mark as success
 
+http://localhost:6990/bamboo/rest/metrics/1.0/token?code=tN0v3BalYoGNr6T9f5xdmEca6CWY6X&client_id=b9b8567a-3c2f-11f0-aa37-da7ad0900002&site=https%3A%2F%2Fapp.datadoghq.com&domain=datadoghq.com&dd_oid=8c2568ff-00cb-11ea-a77b-9b0d461a8f8c&dd_org_name=Datadog+Demo+%2811287%29
+

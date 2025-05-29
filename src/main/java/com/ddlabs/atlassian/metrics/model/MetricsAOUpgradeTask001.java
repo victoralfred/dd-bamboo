@@ -3,6 +3,7 @@ package com.ddlabs.atlassian.metrics.model;
 import com.atlassian.activeobjects.external.ActiveObjects;
 import com.atlassian.activeobjects.external.ActiveObjectsUpgradeTask;
 import com.atlassian.activeobjects.external.ModelVersion;
+import com.ddlabs.atlassian.data.entity.MSConfigEntity;
 
 public class MetricsAOUpgradeTask001 implements ActiveObjectsUpgradeTask {
     @Override
@@ -14,9 +15,9 @@ public class MetricsAOUpgradeTask001 implements ActiveObjectsUpgradeTask {
     @SuppressWarnings("unchecked")
     public void upgrade(ModelVersion modelVersion, ActiveObjects activeObjects) {
         {
-            activeObjects.migrate(MSConfig.class); // (4)
+            activeObjects.migrate(MSConfigEntity.class); // (4)
 
-            for (MSConfig todo : activeObjects.find(MSConfig.class)) // (5)
+            for (MSConfigEntity todo : activeObjects.find(MSConfigEntity.class)) // (5)
             {
                 System.out.println("todo");
             }

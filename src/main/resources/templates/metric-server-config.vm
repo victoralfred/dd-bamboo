@@ -29,7 +29,7 @@
             <tbody>
                 #foreach ($server in $servers)
                 <tr>
-                    <td>$server.name</td>
+                    <td>$server.serverName</td>
                     <td>
                         #if ($server.online == true)
                             <span class="aui-lozenge aui-lozenge-success">Connected</span>

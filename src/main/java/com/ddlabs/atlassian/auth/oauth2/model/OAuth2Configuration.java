@@ -17,17 +17,7 @@ public class OAuth2Configuration {
     public OAuth2Configuration() {
     }
     
-    public OAuth2Configuration(String clientId, String clientSecret, String redirectUri, 
-                              String authEndpoint, String tokenEndpoint, String apiEndpoint) {
-        this.clientId = clientId;
-        this.clientSecret = clientSecret;
-        this.redirectUri = redirectUri;
-        this.authEndpoint = authEndpoint;
-        this.tokenEndpoint = tokenEndpoint;
-        this.apiEndpoint = apiEndpoint;
-        this.codeChallengeMethod = "S256"; // Default to S256
-    }
-    
+
     public String getClientId() {
         return clientId;
     }
@@ -98,5 +88,20 @@ public class OAuth2Configuration {
     
     public void setCodeChallengeMethod(String codeChallengeMethod) {
         this.codeChallengeMethod = codeChallengeMethod;
+    }
+
+    @Override
+    public String toString() {
+        return "OAuth2Configuration{" +
+                "clientId='" + clientId + '\'' +
+                ", clientSecret='" + clientSecret + '\'' +
+                ", redirectUri='" + redirectUri + '\'' +
+                ", authEndpoint='" + authEndpoint + '\'' +
+                ", tokenEndpoint='" + tokenEndpoint + '\'' +
+                ", apiEndpoint='" + apiEndpoint + '\'' +
+                ", codeVerifier='" + codeVerifier + '\'' +
+                ", codeChallenge='" + codeChallenge + '\'' +
+                ", codeChallengeMethod='" + codeChallengeMethod + '\'' +
+                '}';
     }
 }

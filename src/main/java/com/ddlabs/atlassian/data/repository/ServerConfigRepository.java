@@ -1,6 +1,7 @@
 package com.ddlabs.atlassian.data.repository;
 
 import com.ddlabs.atlassian.data.dto.ServerConfigDTO;
+import com.ddlabs.atlassian.data.entity.MSConfigEntity;
 import com.ddlabs.atlassian.exception.DataAccessException;
 
 import java.util.List;
@@ -17,7 +18,7 @@ public interface ServerConfigRepository {
      * @return The server configuration, or null if not found
      * @throws DataAccessException If an error occurs
      */
-    ServerConfigDTO findByServerType(String serverType) throws DataAccessException;
+    MSConfigEntity findByServerType(String serverType) throws DataAccessException;
     
     /**
      * Finds all server configurations.
@@ -31,10 +32,10 @@ public interface ServerConfigRepository {
      * Saves a server configuration.
      *
      * @param config The server configuration to save
-     * @return The saved server configuration
+     * @return The saved server message
      * @throws DataAccessException If an error occurs
      */
-    ServerConfigDTO save(ServerConfigDTO config) throws DataAccessException;
+    String save(ServerConfigDTO config) throws DataAccessException;
     
     /**
      * Updates a server configuration.
@@ -42,7 +43,7 @@ public interface ServerConfigRepository {
      * @param config The server configuration to update
      * @throws DataAccessException If an error occurs
      */
-    void update(ServerConfigDTO config) throws DataAccessException;
+    void update(MSConfigEntity config) throws DataAccessException;
     
     /**
      * Deletes a server configuration by server type.

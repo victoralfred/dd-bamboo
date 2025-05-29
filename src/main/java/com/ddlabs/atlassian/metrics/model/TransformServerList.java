@@ -1,21 +1,26 @@
 package com.ddlabs.atlassian.metrics.model;
 
+import com.ddlabs.atlassian.data.entity.MSConfigEntity;
 import org.springframework.stereotype.Component;
 
+import java.time.Instant;
 import java.util.function.Function;
 @Component
-public class TransformServerList implements Function<MSConfig, ConfiguredMetricServers> {
+public class TransformServerList implements Function<MSConfigEntity, ConfiguredMetricServers> {
 
     @Override
-    public ConfiguredMetricServers apply(MSConfig msConfig) {
-        if (msConfig == null) {
+    public ConfiguredMetricServers apply(MSConfigEntity msConfigEntity) {
+        if (msConfigEntity == null) {
             return null;
         }
         return new ConfiguredMetricServers(
-                msConfig.getServerName(),
-                msConfig.getConfigured(),
-                msConfig.getEnabled(),
-                msConfig.getServerType()// Assuming serverType is an integer where 1 indicates a specific type
+                msConfigEntity.getServerName(),
+                msConfigEntity.getEnabled(),
+                msConfigEntity.getAccessToken() != null && msConfigEntity.getAccessTokenExpiry()> Instant.now().getEpochSecond(),
+                msConfigEntity.getServerType(),
+                msConfigEntity.getConfigured(),
+                msConfigEntity.getEnabled(),
+                msConfigEntity.getDescription()
         );
     }
 }

@@ -2,8 +2,8 @@ package com.ddlabs.atlassian.util;
 
 import com.ddlabs.atlassian.exception.ValidationException;
 
+import javax.annotation.CheckForNull;
 import java.util.Collection;
-import java.util.Objects;
 
 /**
  * Utility class for validation operations.
@@ -33,16 +33,14 @@ public final class ValidationUtils {
     /**
      * Validates that the given string is not null or empty.
      *
-     * @param string The string to validate
+     * @param string  The string to validate
      * @param message The error message if validation fails
-     * @return The validated string
      * @throws ValidationException If validation fails
      */
-    public static String validateNotEmpty(String string, String message) {
+    public static void validateNotEmpty(String string, String message) {
         if (string == null || string.trim().isEmpty()) {
             throw new ValidationException(message, message);
         }
-        return string;
     }
     
     /**
@@ -71,6 +69,21 @@ public final class ValidationUtils {
     public static void validateCondition(boolean condition, String message) {
         if (!condition) {
             throw new ValidationException(message, message);
+        }
+    }
+    /**
+     * Checks that the given reference is not null.
+     *
+     * @param reference The reference to check
+     * @param <T> The type of the reference
+     * @return The non-null reference
+     * @throws NullPointerException If the reference is null
+     */
+    public static <T> T checkNotNull(@CheckForNull T reference) {
+        if (reference == null) {
+            throw new NullPointerException();
+        } else {
+            return reference;
         }
     }
 }

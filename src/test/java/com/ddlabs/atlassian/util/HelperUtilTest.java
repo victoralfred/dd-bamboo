@@ -1,6 +1,7 @@
 package com.ddlabs.atlassian.util;
 
 import static org.junit.jupiter.api.Assertions.*;
+
 import com.ddlabs.atlassian.util.exceptions.NullOrEmptyFieldsException;
 import junit.framework.TestCase;
 

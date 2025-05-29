@@ -6,8 +6,6 @@ import com.ddlabs.atlassian.api.PluginDaoRepository;
 import com.ddlabs.atlassian.metrics.model.ConfiguredMetricServers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -44,6 +42,16 @@ public class MetricServerConfiguration extends HttpServlet {
         List<ConfiguredMetricServers> serverConfigs = pluginDaoRepository.getAllServerConfigs();
         resp.setContentType("text/html; charset=UTF-8");
         params.put("servers", serverConfigs);
+        if(log.isDebugEnabled()) {
+            serverConfigs.forEach(configuredMetricServer -> log.debug("Configured Metric Server: {}, Online: {}, Authentication: {}, Type: {}, Configured: {}, Enabled: {}, Description: {}",
+                    configuredMetricServer.getServerName(),
+                    configuredMetricServer.isOnline(),
+                    configuredMetricServer.isAuthentication(),
+                    configuredMetricServer.getServerType(),
+                    configuredMetricServer.isConfigured(),
+                    configuredMetricServer.isEnabled(),
+                    configuredMetricServer.getDescription()));
+        }
 
         params.put("isAdmin", userService.isAuthenticatedUserAndAdmin());
         log.info("Rendering metric server configuration page with params: {}", params.get("servers"));

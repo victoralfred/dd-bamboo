@@ -1,9 +1,9 @@
 package com.ddlabs.atlassian.api;
 
 import com.atlassian.activeobjects.tx.Transactional;
+import com.ddlabs.atlassian.data.dto.ServerConfigDTO;
 import com.ddlabs.atlassian.metrics.model.ConfiguredMetricServers;
-import com.ddlabs.atlassian.metrics.model.MSConfig;
-import com.ddlabs.atlassian.metrics.model.ServerConfigProperties;
+import com.ddlabs.atlassian.data.entity.MSConfigEntity;
 
 import java.util.List;
 
@@ -19,20 +19,20 @@ public interface PluginDaoRepository {
      * @param properties the server configuration properties to save
      * @return a message indicating the result of the save operation
      */
-    String saveServerConfig(ServerConfigProperties properties);
+    String saveServerConfig(ServerConfigDTO properties);
     /**
      * Retrieves the server configuration by its type.
      *
      * @param serverType the type of the server to retrieve
      * @return the server configuration if found, otherwise null
      */
-    MSConfig getServerConfigByType(String serverType);
+     MSConfigEntity getServerConfigByType(String serverType);
     /**
      * Updates the server configuration in the database.
      *
      * @param serverConfig the server configuration to update
      */
-    <T extends MSConfig> void updateServerConfig(T serverConfig);
+    <T extends MSConfigEntity> void updateServerConfig(T serverConfig);
     /**
      * Retrieves all configured metric servers.
      *
@@ -46,8 +46,8 @@ public interface PluginDaoRepository {
      */
     void deleteServerConfig(String serverType);
     /**
-     * Retrieves all {@link MSConfig} configuration from Database
+     * Retrieves all {@link MSConfigEntity} configuration from Database
      * @return the server configuration if found, otherwise null
      */
-    List<MSConfig> getMsConfig();
+    List<MSConfigEntity> getMsConfig();
 }

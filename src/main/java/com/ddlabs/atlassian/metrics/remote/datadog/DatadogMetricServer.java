@@ -6,6 +6,8 @@ import com.ddlabs.atlassian.auth.oauth2.model.OAuth2TokenResponse;
 import com.ddlabs.atlassian.auth.oauth2.service.OAuth2Service;
 import com.ddlabs.atlassian.config.UserService;
 import com.ddlabs.atlassian.data.dto.ServerConfigDTO;
+import com.ddlabs.atlassian.data.entity.MSConfigEntity;
+import com.ddlabs.atlassian.data.mapper.ServerConfigMapper;
 import com.ddlabs.atlassian.data.repository.ServerConfigRepository;
 import com.ddlabs.atlassian.exception.AuthenticationException;
 import com.ddlabs.atlassian.exception.ConfigurationException;
@@ -15,8 +17,10 @@ import com.ddlabs.atlassian.metrics.api.MetricsApiClient;
 import com.ddlabs.atlassian.metrics.api.factory.MetricsApiClientFactory;
 import com.ddlabs.atlassian.metrics.model.*;
 import com.ddlabs.atlassian.metrics.remote.MetricServer;
+import com.ddlabs.atlassian.util.HelperUtil;
 import com.ddlabs.atlassian.util.LogUtils;
 import com.ddlabs.atlassian.util.ValidationUtils;
+import com.ddlabs.atlassian.util.exceptions.NullOrEmptyFieldsException;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.slf4j.Logger;
@@ -34,19 +38,20 @@ import java.time.Instant;
 public class DatadogMetricServer implements MetricServer {
     private static final Logger log = LoggerFactory.getLogger(DatadogMetricServer.class);
     private static final String TOKEN_ENDPOINT = "https://api.datadoghq.com/oauth2/v1/token";
-    private static final String GRANT_TYPE_AUTHORIZATION_CODE = "authorization_code";
-    
+    private final ServerConfigMapper serverConfigMapper;
+
     private final OAuth2Service oauth2Service;
     private final UserService userService;
     private final ServerConfigRepository serverConfigRepository;
     private final ServerBodyBuilder serverBodyBuilder;
     private final MetricsApiClientFactory metricsApiClientFactory;
     
-    public DatadogMetricServer(OAuth2Service oauth2Service,
+    public DatadogMetricServer(ServerConfigMapper serverConfigMapper, OAuth2Service oauth2Service,
                                UserService userService,
                                ServerConfigRepository serverConfigRepository,
                                ServerBodyBuilder serverBodyBuilder,
                                MetricsApiClientFactory metricsApiClientFactory) {
+        this.serverConfigMapper = serverConfigMapper;
         this.oauth2Service = ValidationUtils.validateNotNull(oauth2Service, "OAuth2Service cannot be null");
         this.userService = ValidationUtils.validateNotNull(userService, "UserService cannot be null");
         this.serverConfigRepository = ValidationUtils.validateNotNull(serverConfigRepository, "ServerConfigRepository cannot be null");
@@ -59,16 +64,14 @@ public class DatadogMetricServer implements MetricServer {
         try {
             ValidationUtils.validateNotEmpty(serverName, "Server name cannot be empty");
             
-            ServerConfigDTO config = serverConfigRepository.findByServerType(serverName);
+            MSConfigEntity config =  serverConfigRepository.findByServerType(serverName);
             if (config == null) {
                 LogUtils.logError(log, "No server configuration found for server: " + serverName, null);
                 throw new ConfigurationException(ErrorCode.ENTITY_NOT_FOUND,
                         "No server configuration found for server: " + serverName,
                         "Server configuration not found");
             }
-            
             String codeChallenge = userService.decrypt(config.getCodeChallenge());
-            
             OAuth2Configuration oauth2Config = new OAuth2Configuration();
             oauth2Config.setApiEndpoint(config.getApiEndpoint());
             oauth2Config.setAuthEndpoint(config.getOauthEndpoint());
@@ -76,7 +79,6 @@ public class DatadogMetricServer implements MetricServer {
             oauth2Config.setRedirectUri(config.getRedirectUrl());
             oauth2Config.setCodeChallenge(codeChallenge);
             oauth2Config.setCodeChallengeMethod("S256");
-            
             return oauth2Service.generateAuthorizationUrl(oauth2Config);
         } catch (ConfigurationException | AuthenticationException e) {
             throw e;
@@ -94,7 +96,7 @@ public class DatadogMetricServer implements MetricServer {
             ValidationUtils.validateNotEmpty(serverName, "Server name cannot be empty");
             ValidationUtils.validateNotNull(req, "HTTP request cannot be null");
             
-            ServerConfigDTO config = serverConfigRepository.findByServerType(serverName);
+            MSConfigEntity config =  serverConfigRepository.findByServerType(serverName);
             if (config == null) {
                 LogUtils.logError(log, "No server configuration found for server: " + serverName, null);
                 throw new ConfigurationException(ErrorCode.ENTITY_NOT_FOUND,
@@ -148,7 +150,7 @@ public class DatadogMetricServer implements MetricServer {
             JsonObject json = JsonParser.parseString(response).getAsJsonObject();
             int expiresIn = json.get("expires_in").getAsInt();
             
-            ServerConfigDTO config = serverConfigRepository.findByServerType(serverType);
+            MSConfigEntity config =  serverConfigRepository.findByServerType(serverType);
             if (config == null) {
                 LogUtils.logError(log, "No server configuration found for server: " + serverType, null);
                 throw new ConfigurationException(ErrorCode.ENTITY_NOT_FOUND,
@@ -179,32 +181,19 @@ public class DatadogMetricServer implements MetricServer {
                 "http://localhost:6990/bamboo/rest/metrics/1.0/token"
         );
     }
-    
+
     @Override
     public String saveServer(ServerConfigBody serverConfig) throws ValidationException {
         try {
             ValidationUtils.validateNotNull(serverConfig, "Server config cannot be null");
-            
             ServerConfigProperties properties = prepareServerProperties(serverConfig);
             ValidationUtils.validateNotNull(properties, "Server properties cannot be null");
-            
             ServerConfigDTO configDTO = new ServerConfigDTO();
-            configDTO.setServerType(properties.getServerType());
-            configDTO.setServerName(properties.getServerName());
-            configDTO.setDescription(properties.getDescription());
-            configDTO.setClientId(properties.getClientId());
-            configDTO.setClientSecret(properties.getClientSecret());
-            configDTO.setRedirectUrl(properties.getRedirectUrl());
-            configDTO.setCodeVerifier(properties.getCodeVerifier());
-            configDTO.setCodeChallenge(properties.getCodeChallenge());
-            configDTO.setCodeCreationTime(properties.getCodeCreationTime());
-            configDTO.setCodeExpirationTime(properties.getCodeExpirationTime());
-            configDTO.setConfigured(false);
-            configDTO.setEnabled(false);
-            configDTO.setApiEndpoint(properties.getApiEndpoint());
-            configDTO.setOauthEndpoint(properties.getOauthEndpoint());
-            configDTO.setTokenEndpoint(properties.getTokenEndpoint());
-            
+            serverConfigMapper.transForForAuthTokenRequest(configDTO,properties.getServerType(), properties.getServerName(),
+                    properties.getDescription(), properties.getClientId(), properties.getClientSecret(),
+                    properties.getRedirectUrl(), properties.getCodeVerifier(), properties.getCodeChallenge(),
+                    properties.getCodeCreationTime(), properties.getCodeExpirationTime(),properties.getApiEndpoint(),
+                    properties.getOauthEndpoint(), properties.getTokenEndpoint());
             serverConfigRepository.save(configDTO);
             
             return "Server configuration saved successfully.";
@@ -226,7 +215,7 @@ public class DatadogMetricServer implements MetricServer {
         return metricsApiClientFactory.createClient(getClass().getSimpleName());
     }
     
-    private void updateServerConfigFromResponse(ServerConfigDTO config, JsonObject json, HttpServletRequest req, int expiresIn) {
+    private void updateServerConfigFromResponse(MSConfigEntity config, JsonObject json, HttpServletRequest req, int expiresIn) {
         ValidationUtils.validateNotNull(config, "Config cannot be null");
         ValidationUtils.validateNotNull(json, "JSON response cannot be null");
         ValidationUtils.validateNotNull(req, "HTTP request cannot be null");
@@ -251,26 +240,27 @@ public class DatadogMetricServer implements MetricServer {
         config.setOrgId(req.getParameter("dd_oid"));
         config.setOrgName(req.getParameter("dd_org_name"));
     }
-    
+
     private ServerConfigProperties prepareServerProperties(ServerConfigBody serverConfig)
-            throws NoSuchAlgorithmException, ValidationException {
-        ValidationUtils.validateNotNull(serverConfig, "Server config cannot be null");
-        
-        final long CODE_VALIDITY_DURATION_SECONDS = 36 * 1000L;
-        ServerConfigProperties properties = serverBodyBuilder.apply(serverConfig);
-        
-        String codeVerifier = OAuthPKCSCodeChallenge.generateCodeVerifier();
-        String codeChallenge = OAuthPKCSCodeChallenge.generateCodeChallenge(codeVerifier);
-        Instant now = Instant.now();
-        
-        properties.setCodeVerifier(userService.encrypt(codeVerifier));
-        properties.setCodeChallenge(userService.encrypt(codeChallenge));
-        properties.setClientSecret(userService.encrypt(properties.getClientSecret()));
-        properties.setCodeCreationTime(now.toEpochMilli());
-        properties.setCodeExpirationTime(now.plusSeconds(CODE_VALIDITY_DURATION_SECONDS).getEpochSecond());
-        
-        LogUtils.logInfo(log, "Prepared server properties for client ID: {}", properties.getClientId());
-        return properties;
+            throws NoSuchAlgorithmException, NullOrEmptyFieldsException {
+        try {
+            HelperUtil.checkNotNull(serverConfig);
+            final long CODE_VALIDITY_DURATION_SECONDS = 36 * 1000L;
+            ServerConfigProperties properties = serverBodyBuilder.apply(serverConfig);
+            String codeVerifier = OAuthPKCSCodeChallenge.generateCodeVerifier();
+            String codeChallenge = OAuthPKCSCodeChallenge.generateCodeChallenge(codeVerifier);
+            Instant now = Instant.now();
+            properties.setCodeVerifier(userService.encrypt(codeVerifier));
+            properties.setCodeChallenge(userService.encrypt(codeChallenge));
+            properties.setClientSecret(userService.encrypt(properties.getClientSecret()));
+            properties.setCodeCreationTime(now.toEpochMilli());
+            properties.setCodeExpirationTime(now.plusSeconds(CODE_VALIDITY_DURATION_SECONDS).getEpochSecond());
+            log.info("Prepared server properties for client ID: {}", properties.getClientId());
+            return properties;
+        }catch (NullOrEmptyFieldsException exception){
+            log.error("Null or empty fields in server response: ", exception);
+            throw new NullOrEmptyFieldsException(exception);
+        }
     }
     
     private String getJsonString(JsonObject json, String key) {

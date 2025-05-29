@@ -41,7 +41,7 @@
 
     <ao key="ao-module">
         <description>Active Objects service used by this Metrics Server configuration</description>
-        <entity>com.ddlabs.atlassian.metrics.model.MSConfig</entity>
+        <entity>com.ddlabs.atlassian.data.entity.MSConfigEntity</entity>
         <upgradeTask>com.ddlabs.atlassian.metrics.model.MetricsAOUpgradeTask001</upgradeTask>
     </ao>
 </atlassian-plugin>

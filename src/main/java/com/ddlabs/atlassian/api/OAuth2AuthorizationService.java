@@ -15,29 +15,6 @@ import java.time.Instant;
 
 public interface OAuth2AuthorizationService {
      Logger log = LoggerFactory.getLogger(OAuth2AuthorizationService.class.getName());
-    /**
-     * Builds the authorization URL for OAuth2 authentication.
-     *
-     * @param clientId          The client ID.
-     * @param redirectUri       The redirect URI.
-     * @param responseType      The response type (e.g., "code").
-     * @param code_challenge    The code challenge.
-     * @param codeChallengeMethod The code challenge method (e.g., "S256").
-     * @return The authorization URL.
-     */
-    default String buildAuthorizationUrl(String domain, String clientId,
-                                         String redirectUri, String responseType,
-                                         String code_challenge,
-                                         String codeChallengeMethod){
-        final String OAUTH_ENDPOINT = "oauth2/v1/authorize";
-        final String AUTH_ENDPOINT = domain + "/" + OAUTH_ENDPOINT;
-        return AUTH_ENDPOINT +"?"+
-                "redirect_uri=" + redirectUri +
-                "&client_id=" + clientId +
-                "&response_type=" + responseType +
-                "&code_challenge=" + code_challenge +
-                "&code_challenge_method=" + codeChallengeMethod;
-    }
     default String buildRefreshTokenUrl(String grantType, String refreshToken,  String clientKey,
                                         String clientSecrete){
         return  "grant_type=" + URLEncoder.encode(grantType, StandardCharsets.UTF_8) +
@@ -73,21 +50,6 @@ public interface OAuth2AuthorizationService {
             throw new RuntimeException("Error building authorization code for access token URL: " + e.getMessage(), e);
         }
     }
-    /**
-     * Exchanges the authorization code for an access token.
-     *
-     * @param redirectUri       The redirect URI.
-     * @param clientId          The client ID.
-     * @param clientSecret      The client secret.
-     * @param grantType         The grant type (e.g., "authorization_code").
-     * @param codeVerifier      The code verifier.
-     * @param code              The authorization code.
-     * @param tokenEndpoint     The endpoint of te authorization server
-     * @return The access token response as a string.
-     */
-    String exchangeAuthorizationCodeForAccessToken(String redirectUri, String clientId,
-                                                   String clientSecret, String grantType, String codeVerifier,
-                                                   String code, String tokenEndpoint);
     /**
      * Exchanges the refresh token for a new access token.
      *

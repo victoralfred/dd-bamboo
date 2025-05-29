@@ -2,30 +2,33 @@ package com.ddlabs.atlassian.metrics.api.factory;
 
 import com.ddlabs.atlassian.auth.oauth2.service.OAuth2Service;
 import com.ddlabs.atlassian.data.dto.ServerConfigDTO;
+import com.ddlabs.atlassian.data.mapper.ServerConfigMapper;
 import com.ddlabs.atlassian.data.repository.ServerConfigRepository;
 import com.ddlabs.atlassian.exception.ConfigurationException;
 import com.ddlabs.atlassian.exception.ErrorCode;
 import com.ddlabs.atlassian.metrics.api.MetricsApiClient;
-import com.ddlabs.atlassian.metrics.api.provider.DatadogMetricsApiClient;
 import com.ddlabs.atlassian.util.LogUtils;
 import com.ddlabs.atlassian.util.ValidationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 /**
  * Factory for creating MetricsApiClient instances.
  */
+@Component
 public class MetricsApiClientFactory {
     private static final Logger log = LoggerFactory.getLogger(MetricsApiClientFactory.class);
     
     private final ServerConfigRepository serverConfigRepository;
     private final OAuth2Service oauth2Service;
-    
-    public MetricsApiClientFactory(ServerConfigRepository serverConfigRepository, OAuth2Service oauth2Service) {
+    private final ServerConfigMapper serverConfigMapper;
+    public MetricsApiClientFactory(ServerConfigRepository serverConfigRepository, OAuth2Service oauth2Service, ServerConfigMapper serverConfigMapper) {
         this.serverConfigRepository = ValidationUtils.validateNotNull(serverConfigRepository, 
                 "ServerConfigRepository cannot be null");
         this.oauth2Service = ValidationUtils.validateNotNull(oauth2Service, 
                 "OAuth2Service cannot be null");
+        this.serverConfigMapper = serverConfigMapper;
     }
     
     /**
@@ -39,7 +42,8 @@ public class MetricsApiClientFactory {
         try {
             ValidationUtils.validateNotEmpty(serverType, "Server type cannot be empty");
             
-            ServerConfigDTO config = serverConfigRepository.findByServerType(serverType);
+            ServerConfigDTO config = serverConfigMapper.toDtoForAccessTokenCreation(
+                    serverConfigRepository.findByServerType(serverType));
             if (config == null) {
                 throw new ConfigurationException(ErrorCode.CONFIGURATION_ERROR, 
                         "No configuration found for server type: " + serverType, 

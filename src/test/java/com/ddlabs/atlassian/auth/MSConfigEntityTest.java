@@ -1,17 +1,12 @@
 package com.ddlabs.atlassian.auth;
-import com.ddlabs.atlassian.metrics.model.MSConfig;
+import com.ddlabs.atlassian.data.entity.MSConfigEntity;
 import net.java.ao.EntityManager;
 import net.java.ao.RawEntity;
 import java.beans.PropertyChangeListener;
 
-public class MSConfigTest implements MSConfig {
-    private String clientId;
-    private String clientSecret;
-    private String refreshToken;
-    private String tokenEndpoint;
-    private long accessTokenExpiry;
+public class MSConfigEntityTest implements MSConfigEntity {
+
     public void setClientId(String s) {
-        this.clientId = s;
     }
 
     @Override
@@ -70,16 +65,14 @@ public class MSConfigTest implements MSConfig {
     }
 
     public void setClientSecret(String s) {
-        this.clientSecret = s;
     }
 
     public void setRefreshToken(String s) {
-        this.refreshToken = s;
     }
 
     @Override
     public void setAccessTokenExpiry(Long accessTokenExpiry) {
-        this.accessTokenExpiry = accessTokenExpiry;
+        long accessTokenExpiry1 = accessTokenExpiry;
 
     }
 
@@ -124,7 +117,6 @@ public class MSConfigTest implements MSConfig {
     }
 
     public void setTokenEndpoint(String url) {
-        this.tokenEndpoint = url;
     }
 
     @Override
