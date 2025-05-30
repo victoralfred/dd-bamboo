@@ -16,7 +16,7 @@ public class OAuthPKCSCodeChallengeTest extends TestCase {
     }
     public void testGenerateCodeChallenge() {
         String codeVerifier = "testCodeVerifier";
-        String codeChallenge = null;
+        String codeChallenge;
         try {
             codeChallenge = OAuthPKCSCodeChallenge.generateCodeChallenge(codeVerifier);
         } catch (NoSuchAlgorithmException e) {

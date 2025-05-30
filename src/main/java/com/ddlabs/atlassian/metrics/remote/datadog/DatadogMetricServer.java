@@ -20,7 +20,7 @@ import com.ddlabs.atlassian.metrics.remote.MetricServer;
 import com.ddlabs.atlassian.util.HelperUtil;
 import com.ddlabs.atlassian.util.LogUtils;
 import com.ddlabs.atlassian.util.ValidationUtils;
-import com.ddlabs.atlassian.util.exceptions.NullOrEmptyFieldsException;
+import com.ddlabs.atlassian.exception.NullOrEmptyFieldsException;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.slf4j.Logger;
@@ -89,7 +89,6 @@ public class DatadogMetricServer implements MetricServer {
                     "Failed to set up authentication");
         }
     }
-
     @Override
     public String getAccessToken(HttpServletRequest req, String serverName) throws ValidationException {
         try {

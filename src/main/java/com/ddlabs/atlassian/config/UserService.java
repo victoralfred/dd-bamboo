@@ -40,6 +40,13 @@ public class UserService {
     public String decrypt(String word) {
         return secretEncryptionService.decrypt(word);
     }
+    public void authCheck(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        if (!isAuthenticatedUserAndAdmin()) {
+            resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+             redirectToLoginPage(req, resp);
+            return;
+        }
+    }
     private URI getLoginUrl(HttpServletRequest req) {
         String redirectUrl = req.getRequestURL().toString();
         String queryString = req.getQueryString();

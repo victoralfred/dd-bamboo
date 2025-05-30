@@ -10,13 +10,14 @@ import com.ddlabs.atlassian.data.entity.MSConfigEntity;
 import com.ddlabs.atlassian.http.HttpClient;
 import com.ddlabs.atlassian.metrics.remote.MetricServer;
 import com.ddlabs.atlassian.util.HelperUtil;
-import com.ddlabs.atlassian.util.exceptions.NullOrEmptyFieldsException;
+import com.ddlabs.atlassian.exception.NullOrEmptyFieldsException;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Instant;
+import java.util.Locale;
 
 import static com.ddlabs.atlassian.util.HelperUtil.getJsonString;
 
@@ -73,7 +74,7 @@ public class OAuth2AuthorizationServiceImpl implements OAuth2AuthorizationServic
     private void refreshAndUpdateToken(MSConfigEntity msConfigEntity, String serverType) throws Exception {
         try {
             String response = exchangeRefreshTokenForAccessToken(
-                    GrantType.REFRESH_TOKEN.toString(),
+                    GrantType.REFRESH_TOKEN.toString().toLowerCase(Locale.ROOT),
                     msConfigEntity.getRefreshToken(),
                     msConfigEntity.getClientId(),
                     userService.decrypt(msConfigEntity.getClientSecret()),

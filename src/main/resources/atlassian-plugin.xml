@@ -18,6 +18,7 @@
         <dependency>com.atlassian.auiplugin:aui-experimental-iconfont</dependency>
         <resource type="download" name="dd-bamboo-metrics.css" location="/css/dd-bamboo-metrics.css"/>
         <resource type="download" name="dd-bamboo-metrics.js" location="/js/dd-bamboo-metrics.js"/>
+        <resource type="download" name="add-new-server-event.js" location="js/add-new-server-event.js"/>
         <resource type="download" name="images/" location="/images"/>
         <context>dd-bamboo-metrics</context>
     </web-resource>
@@ -25,13 +26,17 @@
         <description>Metrics Configuration</description>
         <label key="Metrics"/>
     </web-section>
-    <web-item key="metric.config.web.item" section="system.admin/metric.config.web.section" weight="100">
-        <description>Metrics Configuration</description>
-        <label key="Configuration"/>
+    <web-item key="metric.view.web.item" section="system.admin/metric.config.web.section" weight="100">
+        <description>View Metrics Servers</description>
+        <label key="Metric Servers"/>
         <link>/plugins/servlet/metrics</link>
     </web-item>
     <servlet name="Metrics" key="metrics-config" class="com.ddlabs.atlassian.config.MetricServerConfiguration">
         <description>Metrics Server Configuration</description>
+        <url-pattern>/configure</url-pattern>
+    </servlet>
+    <servlet name="Metrics" key="metrics-view" class="com.ddlabs.atlassian.config.MetricServerView">
+        <description>Metrics Server View</description>
         <url-pattern>/metrics</url-pattern>
     </servlet>
     <rest key="Authorization and Manifest" path="/metrics" version="1.0">

@@ -3,7 +3,7 @@ package com.ddlabs.atlassian.api;
 import com.atlassian.sal.core.util.Assert;
 import com.ddlabs.atlassian.metrics.remote.MetricServer;
 import com.ddlabs.atlassian.util.HelperUtil;
-import com.ddlabs.atlassian.util.exceptions.NullOrEmptyFieldsException;
+import com.ddlabs.atlassian.exception.NullOrEmptyFieldsException;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

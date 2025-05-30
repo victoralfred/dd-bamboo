@@ -1,6 +1,6 @@
 package com.ddlabs.atlassian.util;
 
-import com.ddlabs.atlassian.util.exceptions.NullOrEmptyFieldsException;
+import com.ddlabs.atlassian.exception.NullOrEmptyFieldsException;
 import com.google.gson.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

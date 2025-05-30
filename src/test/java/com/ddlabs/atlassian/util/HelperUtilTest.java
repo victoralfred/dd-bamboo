@@ -2,7 +2,7 @@ package com.ddlabs.atlassian.util;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.ddlabs.atlassian.util.exceptions.NullOrEmptyFieldsException;
+import com.ddlabs.atlassian.exception.NullOrEmptyFieldsException;
 import junit.framework.TestCase;
 
 public class HelperUtilTest extends TestCase {

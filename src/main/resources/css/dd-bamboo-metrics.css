@@ -12,9 +12,10 @@
     font-weight: bold;
     color: #ffffff;
 }
-.aui-icon-refresh{
-    color: #1b3225;
-    border: 1px solid #1b3225;
-    font-size: x-large;
-    background-color: #1b3225;
+#toolbar{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
 }

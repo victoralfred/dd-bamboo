@@ -1,6 +1,5 @@
 package com.ddlabs.atlassian.auth.oauth2.service;
 
-import com.ddlabs.atlassian.auth.oauth2.model.GrantType;
 import com.ddlabs.atlassian.auth.oauth2.model.OAuth2Configuration;
 import com.ddlabs.atlassian.auth.oauth2.model.OAuth2TokenResponse;
 import com.ddlabs.atlassian.exception.AuthenticationException;
@@ -28,17 +27,6 @@ public interface OAuth2Service {
      * @throws AuthenticationException If an error occurs
      */
     OAuth2TokenResponse exchangeCodeForTokens(String code, OAuth2Configuration config) throws AuthenticationException;
-    
-    /**
-     * Refreshes an access token using a refresh token.
-     *
-     * @param refreshToken The refresh token
-     * @param config The OAuth2 configuration
-     * @return The OAuth2 token response
-     * @throws AuthenticationException If an error occurs
-     */
-    OAuth2TokenResponse refreshAccessToken(String refreshToken, OAuth2Configuration config) throws AuthenticationException;
-    
     /**
      * Checks if an access token is expired.
      *

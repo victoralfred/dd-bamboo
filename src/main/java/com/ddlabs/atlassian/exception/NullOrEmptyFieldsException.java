@@ -1,4 +1,4 @@
-package com.ddlabs.atlassian.util.exceptions;
+package com.ddlabs.atlassian.exception;
 
 public class NullOrEmptyFieldsException extends RuntimeException {
     private static final long serialVersionUID = 1L;

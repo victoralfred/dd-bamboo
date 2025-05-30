@@ -1,0 +1,63 @@
+<html lang="html">
+<head>
+    <title>$i18n.getText("application.name")</title>
+    <meta charset="UTF-8">
+    <meta name="decorator" content="atl.admin">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    $webResourceManager.requireResource("com.ddlabs.atlassian.dd-bamboo-metrics:dd-bamboo-metrics-resources")
+</head>
+<body>
+    <div id="toolbar">
+        <h1>$i18n.getText("application.configuration.header")</h1>
+        <div class="aui-toolbar inline">
+
+            <ul class="toolbar-group">
+                <li class="toolbar-item">
+                    <div class="aui-button aui-button-primary" id="add-new-server-button">Add Server</div>
+                </li>
+
+            </ul>
+        </div>
+    </div>
+<div class="aui">
+    <p>Configured Metric Servers</p>
+
+    </div>
+<div class="form-view shared-capability-form">
+    <div class="form-view">
+        <h3>Server status</h3>
+        <p>List of metrics servers authentication and online status</p>
+        <table class="aui" id="metrics-server-status-table">
+            <thead>
+            <tr>
+                <th class="aui-table-column-issue-key">Server</th>
+                <th class="aui-table-column-issue-key">Status</th>
+                <th>Action</th>
+            </tr>
+            </thead>
+            <tbody>
+                #foreach ($server in $servers)
+                <tr>
+                    <td>$server.serverName</td>
+                    <td>
+                        #if ($server.authentication != true)
+                            <button class="aui-button aui-button-warning" id="connect-metrics-server-oauth"
+                                    data-server-id="$server.serverType">Connect</button>
+                        #else
+                            <span class="aui-lozenge aui-lozenge-moved connected-metrics-server"
+                                  data-server-id="$server.serverType">Refresh</span>
+                        #end
+                    </td>
+                    <td>
+                        <span class="aui-icon aui-icon-small aui-iconfont-refresh"
+                              id="test-oauth"
+                              data-server-id="$server.serverType">Refresh</span>
+                    </td>
+                </tr>
+                #end
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>
