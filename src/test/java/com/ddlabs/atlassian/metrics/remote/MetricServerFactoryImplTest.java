@@ -2,10 +2,10 @@ package com.ddlabs.atlassian.metrics.remote;
 
 import com.ddlabs.atlassian.auth.oauth2.service.OAuth2Service;
 import com.ddlabs.atlassian.config.UserService;
+import com.ddlabs.atlassian.config.model.ServerBodyBuilder;
 import com.ddlabs.atlassian.data.mapper.ServerConfigMapper;
 import com.ddlabs.atlassian.data.repository.ServerConfigRepository;
 import com.ddlabs.atlassian.metrics.api.factory.MetricsApiClientFactory;
-import com.ddlabs.atlassian.metrics.model.ServerBodyBuilder;
 import com.ddlabs.atlassian.metrics.remote.datadog.DatadogMetricServer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,7 +30,7 @@ class MetricServerFactoryImplTest {
     @Mock
     private  ServerConfigRepository serverConfigRepository;
     @Mock
-    private  ServerBodyBuilder serverBodyBuilder;
+    private ServerBodyBuilder serverBodyBuilder;
     @Mock
     private  MetricsApiClientFactory metricsApiClientFactory;
     @BeforeEach
