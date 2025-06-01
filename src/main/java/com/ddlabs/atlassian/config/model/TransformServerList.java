@@ -1,4 +1,4 @@
-package com.ddlabs.atlassian.metrics.model;
+package com.ddlabs.atlassian.config.model;
 
 import com.ddlabs.atlassian.data.entity.MSConfigEntity;
 import org.springframework.stereotype.Component;

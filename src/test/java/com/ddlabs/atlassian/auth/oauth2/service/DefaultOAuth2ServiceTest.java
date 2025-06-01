@@ -5,6 +5,7 @@ import com.ddlabs.atlassian.auth.oauth2.model.OAuth2TokenResponse;
 import com.ddlabs.atlassian.exception.AuthenticationException;
 import com.ddlabs.atlassian.http.HttpClient;
 import org.junit.Before;
+import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
@@ -40,7 +41,7 @@ public class DefaultOAuth2ServiceTest {
         testConfig.setCodeVerifier("test-code-verifier");
     }
     
-
+    @Test
     public void testGenerateAuthorizationUrl() throws AuthenticationException {
         String authUrl = oauth2Service.generateAuthorizationUrl(testConfig);
         
@@ -52,7 +53,8 @@ public class DefaultOAuth2ServiceTest {
         assertTrue(authUrl.contains("code_challenge=" + testConfig.getCodeChallenge()));
         assertTrue(authUrl.contains("code_challenge_method=" + testConfig.getCodeChallengeMethod()));
     }
-    
+
+    @Test
 
     public void testExchangeCodeForTokens() throws Exception {
         String tokenResponse = "{"
@@ -75,11 +77,8 @@ public class DefaultOAuth2ServiceTest {
         assertEquals("read write", response.getScope());
         assertEquals(3600, response.getExpiresIn());
     }
-    
 
-
-    
-
+    @Test
     public void testIsAccessTokenExpired() {
         // Token expired 1 second ago
         long expiredTime = Instant.now().minusSeconds(1).getEpochSecond();

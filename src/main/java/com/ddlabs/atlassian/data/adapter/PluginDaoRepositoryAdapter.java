@@ -4,11 +4,13 @@ import com.atlassian.activeobjects.external.ActiveObjects;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.ddlabs.atlassian.api.PluginDaoRepository;
 
+import com.ddlabs.atlassian.config.model.ConfiguredMetricServers;
+import com.ddlabs.atlassian.config.model.TransformServerList;
 import com.ddlabs.atlassian.data.dto.ServerConfigDTO;
 import com.ddlabs.atlassian.data.entity.MSConfigEntity;
 import com.ddlabs.atlassian.exception.DataAccessException;
 import com.ddlabs.atlassian.exception.ErrorCode;
-import com.ddlabs.atlassian.metrics.model.*;
+import com.ddlabs.atlassian.http.TokenStore;
 
 import com.ddlabs.atlassian.util.LogUtils;
 import com.ddlabs.atlassian.util.ValidationUtils;
@@ -16,7 +18,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.CheckForNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -28,11 +29,13 @@ import java.util.stream.Collectors;
  */
 @Component
 public class PluginDaoRepositoryAdapter implements PluginDaoRepository {
+    private final TokenStore tokenStore;
     private final Logger log = LoggerFactory.getLogger(PluginDaoRepositoryAdapter.class);
     @ComponentImport
     private final ActiveObjects ao;
     private final TransformServerList transformServerList;
-    public PluginDaoRepositoryAdapter(ActiveObjects ao, TransformServerList transformServerList) {
+    public PluginDaoRepositoryAdapter(TokenStore tokenStore, ActiveObjects ao, TransformServerList transformServerList) {
+        this.tokenStore = tokenStore;
         this.ao = ValidationUtils.validateNotNull(ao, "ActiveObjects cannot be null");
         this.transformServerList = ValidationUtils.validateNotNull(transformServerList, "ServerConfigMapper cannot be null");
 
@@ -93,7 +96,8 @@ public class PluginDaoRepositoryAdapter implements PluginDaoRepository {
         config[0].setOrgId(serverConfig.getOrgId());
         config[0].setOrgName(serverConfig.getOrgName());
         config[0].save();
-
+        tokenStore.removeToken("datadog_access_token");
+        tokenStore.putToken("datadog_access_token", serverConfig.getAccessToken());
     }
     @Override
     public List<ConfiguredMetricServers> getAllServerConfigs() {

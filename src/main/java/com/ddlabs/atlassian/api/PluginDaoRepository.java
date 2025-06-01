@@ -2,7 +2,7 @@ package com.ddlabs.atlassian.api;
 
 import com.atlassian.activeobjects.tx.Transactional;
 import com.ddlabs.atlassian.data.dto.ServerConfigDTO;
-import com.ddlabs.atlassian.metrics.model.ConfiguredMetricServers;
+import com.ddlabs.atlassian.config.model.ConfiguredMetricServers;
 import com.ddlabs.atlassian.data.entity.MSConfigEntity;
 
 import java.util.List;

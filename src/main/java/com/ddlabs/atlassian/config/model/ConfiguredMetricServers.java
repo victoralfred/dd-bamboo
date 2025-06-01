@@ -1,4 +1,4 @@
-package com.ddlabs.atlassian.metrics.model;
+package com.ddlabs.atlassian.config.model;
 
 import java.io.Serial;
 import java.io.Serializable;

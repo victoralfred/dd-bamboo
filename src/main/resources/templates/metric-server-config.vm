@@ -10,43 +10,7 @@
 <div id="page_wrapper">
     <h1>$i18n.getText("application.configuration.header")</h1>
 </div>
-<div class="form-view shared-capability-form">
-    <div class="form-view">
-        <h3>Server status</h3>
-        #if ($servers.size() > 0)
-            <p>To connect to the metrics server, you need to authenticate using OAuth. Click the Authenticate button start the authentication process.</p>
-        #end
-        <table class="aui" id="metrics-server-status-table">
-            <thead>
-                <tr>
-                    <th class="aui-table-column-issue-key">Server</th>
-                    <th class="aui-table-column-issue-key">Status</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                #foreach ($server in $servers)
-                <tr>
-                    <td>$server.serverName</td>
-                    <td>
-                        #if ($server.authentication != true)
-                            <button class="aui-button aui-button-warning" id="connect-metrics-server-oauth"
-                                    data-server-id="$server.serverType">Connect</button>
-                        #else
-                            <button class="aui-button connected-metrics-server"
-                                    data-server-id="$server.serverType">Refresh</button>
-                        #end
-                    </td>
-                    <td>
-                        <span class="aui-icon aui-icon-small aui-iconfont-refresh"
-                              id="test-oauth"
-                              data-server-id="$server.serverType">Refresh</span>
-                    </td>
-                </tr>
-                #end
-            </tbody>
-        </table>
-    </div>
+<div>
     <div class="aui">
         <br>
         <h2>$i18n.getText("application.servers.add")</h2>
@@ -118,6 +82,6 @@
         </div>
     </form>
 </div>
-    #include("/templates/metric-server-oauth.vm")
+
 </body>
 </html>

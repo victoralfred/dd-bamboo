@@ -58,4 +58,13 @@ public interface HttpClient {
      * @throws ApiException If an error occurs
      */
     <T> String post(String url, T body) throws ApiException;
+    /**
+     * Sends a POST request to the specified URL with the specified series point, content type, and Datadog metric server.
+     *
+     * @param url The URL to send the request to
+     * @param seriesPoint The series point to include in the request body
+     * @param contentType The content type of the request
+     * @param authToken The authentication token for the Datadog metric server
+     */
+    void post(String url, String seriesPoint, String contentType, String authToken) throws ApiException;
 }

@@ -2,6 +2,7 @@ package com.ddlabs.atlassian.http;
 
 import com.ddlabs.atlassian.exception.ApiException;
 import com.ddlabs.atlassian.exception.ErrorCode;
+import com.ddlabs.atlassian.metrics.remote.datadog.MetricsApiProvider;
 import com.ddlabs.atlassian.util.LogUtils;
 import com.google.gson.Gson;
 import org.slf4j.Logger;
@@ -26,9 +27,8 @@ import java.util.Map;
 public class DefaultHttpClient implements HttpClient {
     private static final Logger log = LoggerFactory.getLogger(DefaultHttpClient.class);
     private static final int DEFAULT_TIMEOUT_MS = 30000; // 30 seconds
-    
     private final Gson gson;
-    
+
     public DefaultHttpClient() {
         this.gson = new Gson();
     }
@@ -88,7 +88,34 @@ public class DefaultHttpClient implements HttpClient {
         String jsonBody = gson.toJson(body);
         return post(url, jsonBody);
     }
-    
+
+    @Override
+    public void post(String url, String seriesPoint, String contentType, String authToken) throws ApiException {
+        try{
+            HttpsURLConnection connection = openConnection(url, "POST");
+            //@todo: Do not commit this hardcoded API keys to the repository
+            connection.setRequestProperty("Content-Type", contentType);
+            connection.setRequestProperty("DD-API-KEY",  "");
+            connection.setRequestProperty("DD-APP-KEY", "");
+
+
+            if (seriesPoint != null && !seriesPoint.isEmpty()) {
+                connection.setDoOutput(true);
+                try (OutputStream os = connection.getOutputStream()) {
+                    byte[] input = seriesPoint.getBytes(StandardCharsets.UTF_8);
+                    os.write(input, 0, input.length);
+                }
+            }
+            String response = handleResponse(connection);
+            LogUtils.logInfo(log, "POST request to {} succeeded with response: {}", url, response);
+        } catch (IOException | URISyntaxException e) {
+            LogUtils.logError(log, "Error sending POST request to " + url, e);
+            throw new ApiException(ErrorCode.API_CONNECTION_ERROR,
+                    "Error sending POST request to " + url,
+                    "Failed to connect to the API", e);
+        }
+    }
+
     private HttpsURLConnection openConnection(String urlString, String method) throws IOException, URISyntaxException {
         URL url = new URI(urlString).toURL();
         HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
