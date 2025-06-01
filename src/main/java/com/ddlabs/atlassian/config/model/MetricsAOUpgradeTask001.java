@@ -1,4 +1,4 @@
-package com.ddlabs.atlassian.metrics.model;
+package com.ddlabs.atlassian.config.model;
 
 import com.atlassian.activeobjects.external.ActiveObjects;
 import com.atlassian.activeobjects.external.ActiveObjectsUpgradeTask;

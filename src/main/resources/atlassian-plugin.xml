@@ -17,8 +17,8 @@
         <dependency>com.atlassian.auiplugin:aui-form-validation</dependency>
         <dependency>com.atlassian.auiplugin:aui-experimental-iconfont</dependency>
         <resource type="download" name="dd-bamboo-metrics.css" location="/css/dd-bamboo-metrics.css"/>
-        <resource type="download" name="dd-bamboo-metrics.js" location="/js/dd-bamboo-metrics.js"/>
-        <resource type="download" name="add-new-server-event.js" location="js/add-new-server-event.js"/>
+        <resource type="download" name="metric-server-config.js" location="/js/metric-server-config.js"/>
+        <resource type="download" name="metrics-server-view.js" location="js/metrics-server-view.js"/>
         <resource type="download" name="images/" location="/images"/>
         <context>dd-bamboo-metrics</context>
     </web-resource>
@@ -43,10 +43,13 @@
         <description>Authorization and Manifest Servlet</description>
         <package>com.ddlabs.atlassian.rest</package>
     </rest>
-
     <ao key="ao-module">
         <description>Active Objects service used by this Metrics Server configuration</description>
         <entity>com.ddlabs.atlassian.data.entity.MSConfigEntity</entity>
-        <upgradeTask>com.ddlabs.atlassian.metrics.model.MetricsAOUpgradeTask001</upgradeTask>
+        <upgradeTask>com.ddlabs.atlassian.config.model.MetricsAOUpgradeTask001</upgradeTask>
     </ao>
+    <bambooEventListener key="metricsEventListeners" name="Collects Metrics Data"
+                         class="com.ddlabs.atlassian.events.MetricsPluginEventListeners">
+        <description>Listens for Bamboo events</description>
+    </bambooEventListener>
 </atlassian-plugin>

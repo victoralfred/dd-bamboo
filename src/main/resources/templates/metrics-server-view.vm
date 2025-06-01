@@ -44,8 +44,7 @@
                             <button class="aui-button aui-button-warning" id="connect-metrics-server-oauth"
                                     data-server-id="$server.serverType">Connect</button>
                         #else
-                            <span class="aui-lozenge aui-lozenge-moved connected-metrics-server"
-                                  data-server-id="$server.serverType">Refresh</span>
+                            <span class="aui-lozenge aui-lozenge-moved connected-metrics-server">Connected</span>
                         #end
                     </td>
                     <td>
@@ -58,6 +57,9 @@
             </tbody>
         </table>
     </div>
+</div>
+<div>
+    #include("/templates/metric-server-oauth.vm")
 </div>
 </body>
 </html>

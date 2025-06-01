@@ -1,8 +1,10 @@
 package com.ddlabs.atlassian.http;
 
 import com.ddlabs.atlassian.exception.ApiException;
+import com.ddlabs.atlassian.metrics.remote.datadog.MetricsApiProvider;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import static org.junit.Assert.*;
@@ -12,7 +14,7 @@ import static org.mockito.Mockito.*;
 public class DefaultHttpClientTest {
 
     private DefaultHttpClient httpClient;
-    
+
     @Before
     public void setUp() {
         MockitoAnnotations.openMocks(this);

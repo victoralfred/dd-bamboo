@@ -1,4 +1,4 @@
-package com.ddlabs.atlassian.metrics.model;
+package com.ddlabs.atlassian.config.model;
 
 public class ApplicationProperties {
     public static int CONNECTION_TIMEOUT = 5000;

@@ -1,18 +1,20 @@
 package it.com.ddlabs.atlassian;
 
+import jakarta.inject.Inject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import com.atlassian.plugins.osgi.test.AtlassianPluginsTestRunner;
 import com.ddlabs.atlassian.api.MyPluginComponent;
 import com.atlassian.sal.api.ApplicationProperties;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.junit.Assert.assertEquals;
 
 @RunWith(AtlassianPluginsTestRunner.class)
 public class MyComponentWiredTest {
-    private final ApplicationProperties applicationProperties;
-    private final MyPluginComponent myPluginComponent;
-
+    private ApplicationProperties applicationProperties;
+    private MyPluginComponent myPluginComponent;
+    @Inject
     public MyComponentWiredTest(ApplicationProperties applicationProperties, MyPluginComponent myPluginComponent) {
         this.applicationProperties = applicationProperties;
         this.myPluginComponent = myPluginComponent;
