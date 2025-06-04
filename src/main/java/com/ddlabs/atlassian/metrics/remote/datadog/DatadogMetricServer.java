@@ -57,9 +57,12 @@ public class DatadogMetricServer implements MetricServer {
         this.serverConfigMapper = serverConfigMapper;
         this.oauth2Service = ValidationUtils.validateNotNull(oauth2Service, "OAuth2Service cannot be null");
         this.userService = ValidationUtils.validateNotNull(userService, "UserService cannot be null");
-        this.serverConfigRepository = ValidationUtils.validateNotNull(serverConfigRepository, "ServerConfigRepository cannot be null");
-        this.serverBodyBuilder = ValidationUtils.validateNotNull(serverBodyBuilder, "ServerBodyBuilder cannot be null");
-        this.metricsApiClientFactory = ValidationUtils.validateNotNull(metricsApiClientFactory, "MetricsApiClientFactory cannot be null");
+        this.serverConfigRepository = ValidationUtils.validateNotNull(serverConfigRepository,
+                "ServerConfigRepository cannot be null");
+        this.serverBodyBuilder = ValidationUtils.validateNotNull(serverBodyBuilder,
+                "ServerBodyBuilder cannot be null");
+        this.metricsApiClientFactory = ValidationUtils.validateNotNull(metricsApiClientFactory,
+                "MetricsApiClientFactory cannot be null");
     }
     
     @Override
@@ -217,7 +220,7 @@ public class DatadogMetricServer implements MetricServer {
         return metricsApiClientFactory.createClient(getClass().getSimpleName());
     }
     
-    private void updateServerConfigFromResponse(MSConfigEntity config, JsonObject json, HttpServletRequest req, int expiresIn) {
+    private void    updateServerConfigFromResponse(MSConfigEntity config, JsonObject json, HttpServletRequest req, int expiresIn) {
         ValidationUtils.validateNotNull(config, "Config cannot be null");
         ValidationUtils.validateNotNull(json, "JSON response cannot be null");
         ValidationUtils.validateNotNull(req, "HTTP request cannot be null");

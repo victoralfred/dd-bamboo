@@ -12,12 +12,20 @@
     <resource type="jsI18n" name="jsI18n" location="dd-bamboo-metrics"/>
     
     <!-- add our web resources -->
-    <web-resource key="dd-bamboo-metrics-resources" name="Web Resources">
+    <web-resource key="dd-bamboo-metrics-resources-configure" name="Web Resources">
         <dependency>com.atlassian.auiplugin:ajs</dependency>
         <dependency>com.atlassian.auiplugin:aui-form-validation</dependency>
         <dependency>com.atlassian.auiplugin:aui-experimental-iconfont</dependency>
+        <dependency>com.atlassian.auiplugin:aui-toggle</dependency>
         <resource type="download" name="dd-bamboo-metrics.css" location="/css/dd-bamboo-metrics.css"/>
         <resource type="download" name="metric-server-config.js" location="/js/metric-server-config.js"/>
+        <resource type="download" name="images/" location="/images"/>
+        <context>dd-bamboo-metrics</context>
+    </web-resource>
+    <web-resource key="dd-bamboo-metrics-resources-view" name="Web Resources">
+        <dependency>com.atlassian.auiplugin:ajs</dependency>
+        <dependency>com.atlassian.auiplugin:aui-experimental-iconfont</dependency>
+        <resource type="download" name="dd-bamboo-metrics.css" location="/css/dd-bamboo-metrics.css"/>
         <resource type="download" name="metrics-server-view.js" location="js/metrics-server-view.js"/>
         <resource type="download" name="images/" location="/images"/>
         <context>dd-bamboo-metrics</context>

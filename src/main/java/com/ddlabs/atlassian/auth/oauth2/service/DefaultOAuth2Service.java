@@ -84,13 +84,6 @@ public class DefaultOAuth2Service implements OAuth2Service {
                     "Failed to exchange authorization code for tokens", e);
         }
     }
-
-    @Override
-    public OAuth2TokenResponse refreshAccessToken(String refreshToken, OAuth2Configuration config) throws AuthenticationException {
-        return null;
-    }
-
-
     @Override
     public boolean isAccessTokenExpired(long accessTokenExpiry) {
         return Instant.now().getEpochSecond() >= accessTokenExpiry;

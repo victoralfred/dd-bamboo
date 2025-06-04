@@ -1,8 +1,9 @@
 package com.ddlabs.atlassian.metrics.remote;
 
-import com.ddlabs.atlassian.metrics.model.ConfigDefaults;
-import com.ddlabs.atlassian.metrics.model.ServerConfigBody;
-import com.ddlabs.atlassian.util.exceptions.NullOrEmptyFieldsException;
+
+import com.ddlabs.atlassian.config.model.ConfigDefaults;
+import com.ddlabs.atlassian.config.model.ServerConfigBody;
+import com.ddlabs.atlassian.exception.NullOrEmptyFieldsException;
 
 import javax.servlet.http.HttpServletRequest;
 public class MockedClass implements MetricServer{
@@ -20,6 +21,7 @@ public class MockedClass implements MetricServer{
     public String saveServer(ServerConfigBody serverConfig) throws NullOrEmptyFieldsException {
         return "";
     }
+
 
     @Override
     public String saveServerMetadata(String serverType, String response, HttpServletRequest req) throws NullOrEmptyFieldsException {
