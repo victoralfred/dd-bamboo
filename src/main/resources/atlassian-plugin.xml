@@ -9,12 +9,24 @@
 
     <!-- add our i18n resource -->
     <resource type="i18n" name="i18n" location="dd-bamboo-metrics"/>
+    <resource type="jsI18n" name="jsI18n" location="dd-bamboo-metrics"/>
     
     <!-- add our web resources -->
-    <web-resource key="dd-bamboo-metrics-resources" name="dd-bamboo-metrics Web Resources">
+    <web-resource key="dd-bamboo-metrics-resources-configure" name="Web Resources">
         <dependency>com.atlassian.auiplugin:ajs</dependency>
+        <dependency>com.atlassian.auiplugin:aui-form-validation</dependency>
+        <dependency>com.atlassian.auiplugin:aui-experimental-iconfont</dependency>
+        <dependency>com.atlassian.auiplugin:aui-toggle</dependency>
         <resource type="download" name="dd-bamboo-metrics.css" location="/css/dd-bamboo-metrics.css"/>
-        <resource type="download" name="dd-bamboo-metrics.js" location="/js/dd-bamboo-metrics.js"/>
+        <resource type="download" name="metric-server-config.js" location="/js/metric-server-config.js"/>
+        <resource type="download" name="images/" location="/images"/>
+        <context>dd-bamboo-metrics</context>
+    </web-resource>
+    <web-resource key="dd-bamboo-metrics-resources-view" name="Web Resources">
+        <dependency>com.atlassian.auiplugin:ajs</dependency>
+        <dependency>com.atlassian.auiplugin:aui-experimental-iconfont</dependency>
+        <resource type="download" name="dd-bamboo-metrics.css" location="/css/dd-bamboo-metrics.css"/>
+        <resource type="download" name="metrics-server-view.js" location="js/metrics-server-view.js"/>
         <resource type="download" name="images/" location="/images"/>
         <context>dd-bamboo-metrics</context>
     </web-resource>
@@ -22,16 +34,30 @@
         <description>Metrics Configuration</description>
         <label key="Metrics"/>
     </web-section>
-    <web-item key="metric.config.web.item" section="system.admin/metric.config.web.section" weight="100">
-        <description>Metrics Configuration</description>
-        <label key="Configuration"/>
+    <web-item key="metric.view.web.item" section="system.admin/metric.config.web.section" weight="100">
+        <description>View Metrics Servers</description>
+        <label key="Metric Servers"/>
         <link>/plugins/servlet/metrics</link>
     </web-item>
-    <servlet name="Metrics" key="metrics-config" class="com.ddlabs.atlassian.config.MetricServerConfiguration">
+    <servlet name="Metrics" key="metrics-config" class="com.ddlabs.atlassian.impl.config.MetricServerConfiguration">
         <description>Metrics Server Configuration</description>
+        <url-pattern>/configure</url-pattern>
+    </servlet>
+    <servlet name="Metrics" key="metrics-view" class="com.ddlabs.atlassian.impl.config.MetricServerView">
+        <description>Metrics Server View</description>
         <url-pattern>/metrics</url-pattern>
     </servlet>
-    <rest key="server-manifest-oauth" path="/metrics" version="1.0">
+    <rest key="Authorization and Manifest" path="/metrics" version="1.0">
         <description>Authorization and Manifest Servlet</description>
+        <package>com.ddlabs.atlassian.rest</package>
     </rest>
+    <ao key="ao-module">
+        <description>Active Objects service used by this Metrics Server configuration</description>
+        <entity>com.ddlabs.atlassian.impl.data.adapter.entity.MSConfigEntity</entity>
+        <upgradeTask>com.ddlabs.atlassian.impl.config.model.MetricsAOUpgradeTask001</upgradeTask>
+    </ao>
+    <bambooEventListener key="metricsEventListeners" name="Collects Metrics Data"
+                         class="com.ddlabs.atlassian.impl.events.MetricsPluginEventListeners">
+        <description>Listens for Bamboo events</description>
+    </bambooEventListener>
 </atlassian-plugin>

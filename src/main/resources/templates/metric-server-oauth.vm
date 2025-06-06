@@ -1,0 +1,19 @@
+<section id="oauth-screen" class="aui-dialog2 aui-dialog2-small aui-layer" role="dialog" aria-hidden="true">
+<div class="authorization-screen">
+    <header class="aui-dialog2-header">
+        <h2 class="aui-dialog2-header-main">Notice</h2>
+        <a class="aui-dialog2-header-close">
+            <span class="aui-icon aui-icon-small aui-iconfont-close-dialog" id="close-dialog">Close</span>
+        </a>
+    </header>
+    <div class="aui-dialog2-content">
+        <p class="notice-info">You will be redirected to the Metric Server to authenticate Bamboo application</p>
+    </div>
+    <input type="hidden" id="serverType">
+    <footer class="aui-dialog2-footer">
+        <div class="aui-dialog2-footer-actions">
+            <button id="authentication-proceed-button" class="aui-button aui-button-primary">Proceed</button>
+        </div>
+    </footer>
+</div>
+</section>

@@ -1,0 +1,32 @@
+#server-type{
+    display: block;
+    border-color: beige;
+    border-radius: 5px;
+    border-width: 2px;
+    padding: 10px;
+}
+.connected-metrics-server{
+    background-color: #0e704a;
+    border-color: #c3e6cb;
+    text-align: center;
+    font-weight: bold;
+    color: #ffffff;
+}
+#toolbar{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+}
+/* these will only affect the button "at rest". */
+.green-button {
+    --aui-btn-bg: #36B37E;
+    --aui-btn-text: #FFF;
+    --aui-btn-border: #006644;
+}
+/* override hover styles in the same way if you want to ;) */
+.green-button:hover {
+    --aui-btn-bg: #FFF;
+    --aui-btn-text: #006644;
+}
