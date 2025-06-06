@@ -33,4 +33,9 @@ public class MockedClass implements MetricServer {
     public ConfigDefaults getConfigDefaults() {
         return null;
     }
+
+    @Override
+    public String deleteServer(String serverName) {
+        return "";
+    }
 }
