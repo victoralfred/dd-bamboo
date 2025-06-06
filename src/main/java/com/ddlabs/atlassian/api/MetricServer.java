@@ -50,4 +50,6 @@ public interface MetricServer {
      * @return An instance of ConfigDefaults containing the default configuration values.
      */
     ConfigDefaults getConfigDefaults();
+
+    String deleteServer(String serverName);
 }

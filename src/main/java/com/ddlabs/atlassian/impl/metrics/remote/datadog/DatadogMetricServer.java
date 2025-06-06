@@ -1,5 +1,6 @@
 package com.ddlabs.atlassian.impl.metrics.remote.datadog;
 
+import com.ddlabs.atlassian.impl.exception.*;
 import com.ddlabs.atlassian.oauth2.OAuthPKCSCodeChallenge;
 import com.ddlabs.atlassian.oauth2.model.OAuth2Configuration;
 import com.ddlabs.atlassian.oauth2.model.OAuth2TokenResponse;
@@ -13,16 +14,11 @@ import com.ddlabs.atlassian.impl.data.adapter.dto.ServerConfigBuilder;
 import com.ddlabs.atlassian.impl.data.adapter.entity.MSConfigEntity;
 import com.ddlabs.atlassian.impl.data.adapter.dto.ServerConfigMapper;
 import com.ddlabs.atlassian.impl.data.adapter.entity.ServerConfigRepository;
-import com.ddlabs.atlassian.impl.exception.AuthenticationException;
-import com.ddlabs.atlassian.impl.exception.ConfigurationException;
-import com.ddlabs.atlassian.impl.exception.ErrorCode;
-import com.ddlabs.atlassian.impl.exception.ValidationException;
 import com.ddlabs.atlassian.api.MetricsApiClient;
 import com.ddlabs.atlassian.impl.metrics.api.factory.MetricsApiClientFactory;
 import com.ddlabs.atlassian.api.MetricServer;
 import com.ddlabs.atlassian.util.LogUtils;
 import com.ddlabs.atlassian.util.ValidationUtils;
-import com.ddlabs.atlassian.impl.exception.NullOrEmptyFieldsException;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.slf4j.Logger;
@@ -184,6 +180,16 @@ public class DatadogMetricServer implements MetricServer {
                 TOKEN_ENDPOINT,
                 "http://localhost:6990/bamboo/rest/metrics/1.0/token"
         );
+    }
+
+    @Override
+    public String deleteServer(String serverName) {
+        try{
+            serverConfigRepository.delete(serverName);
+            return "success";
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

@@ -48,9 +48,9 @@
                         #end
                     </td>
                     <td>
-                        <span class="aui-icon aui-icon-small aui-iconfont-refresh"
-                              id="test-oauth"
-                              data-server-id="$server.serverType">Refresh</span>
+                        <span class="aui-icon aui-icon-small aui-iconfont-cross"
+                              id="delete-server"
+                              data-server-id="$server.serverType">Disable</span>
                     </td>
                 </tr>
                 #end

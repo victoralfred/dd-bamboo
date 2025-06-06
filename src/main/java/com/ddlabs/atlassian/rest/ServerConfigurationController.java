@@ -45,7 +45,6 @@ public class ServerConfigurationController {
         String access_token_response = metricServer.getAccessToken(req, extractServerType(req.getParameter("domain")));
         String response = metricServer.saveServerMetadata(extractServerType(req.getParameter("domain")),
                 access_token_response,req);
-        log.info("Server response {}", response);
         return Response.temporaryRedirect(URI.create("http://localhost:6990/bamboo/plugins/servlet/metrics")).build();
     }
     @POST
@@ -65,6 +64,14 @@ public class ServerConfigurationController {
         userService.isAuthenticatedUserAndAdmin();
         MetricServer metricServer = metricServerFactory.getMetricServer(serverType.getServerType());
         return Response.ok(metricServer.getConfigDefaults()).build();
+    }
+    @DELETE
+    @Path("delete/{serverType}")
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response deleteServer(@PathParam("serverType") String serverType, @Context HttpServletRequest req) {
+        userService.isAuthenticatedUserAndAdmin();
+        MetricServer metricServer = metricServerFactory.getMetricServer(serverType);
+        return Response.ok(metricServer.deleteServer(serverType)).build();
     }
 
     /**
