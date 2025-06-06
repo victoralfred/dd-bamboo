@@ -1,9 +1,12 @@
 package com.ddlabs.atlassian.auth.oauth2.service;
 
-import com.ddlabs.atlassian.auth.oauth2.model.OAuth2Configuration;
-import com.ddlabs.atlassian.auth.oauth2.model.OAuth2TokenResponse;
-import com.ddlabs.atlassian.exception.AuthenticationException;
-import com.ddlabs.atlassian.http.HttpClient;
+import com.ddlabs.atlassian.impl.config.UserService;
+import com.ddlabs.atlassian.impl.data.adapter.entity.ServerConfigRepository;
+import com.ddlabs.atlassian.oauth2.OAuth2AuthorizationServiceImpl;
+import com.ddlabs.atlassian.oauth2.model.OAuth2Configuration;
+import com.ddlabs.atlassian.oauth2.model.OAuth2TokenResponse;
+import com.ddlabs.atlassian.impl.exception.AuthenticationException;
+import com.ddlabs.atlassian.api.HttpClient;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -19,17 +22,20 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 public class DefaultOAuth2ServiceTest {
-    private DefaultOAuth2Service oauth2Service;
-    
+    private OAuth2AuthorizationServiceImpl oauth2Service;
     @Mock
     private HttpClient httpClient;
-    
+    @Mock
+    private  ServerConfigRepository serverConfigRepository;
+    private  UserService userService;
+    @Mock
     private OAuth2Configuration testConfig;
     
     @Before
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        oauth2Service = new DefaultOAuth2Service(httpClient);
+        oauth2Service = new OAuth2AuthorizationServiceImpl(httpClient,
+                serverConfigRepository, userService);
         
         testConfig = new OAuth2Configuration();
         testConfig.setClientId("test-client-id");

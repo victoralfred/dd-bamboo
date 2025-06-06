@@ -73,12 +73,12 @@
                    data-aui-validation-field  data-aui-validation-required="true">
             <div class="description">Redirect URL</div>
         </div>
-        <input type="hidden" name="atl_token" id="atl_token" value="$atl_token"/>
         <div class="buttons-container">
             <div>
                 <div class="select-auth-method"></div>
-                <aui-toggle id="use-api-key-pass-or-oauth"
-                label="API key or Oauth"></aui-toggle>
+                <div class="description">Choose Authentication Type</div>
+                    <aui-toggle id="use-api-key-pass-or-oauth"
+                                label="API key or Oauth"></aui-toggle>
             </div>
             <div class="aui-message aui-message-info">
                 <p class="title">Note:</p>

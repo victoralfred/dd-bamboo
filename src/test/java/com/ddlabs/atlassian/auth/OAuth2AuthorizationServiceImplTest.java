@@ -1,9 +1,10 @@
 package com.ddlabs.atlassian.auth;
 
 
-import com.ddlabs.atlassian.api.PluginDaoRepository;
-import com.ddlabs.atlassian.config.UserService;
-import com.ddlabs.atlassian.http.HttpClient;
+import com.ddlabs.atlassian.oauth2.OAuth2AuthorizationServiceImpl;
+import com.ddlabs.atlassian.impl.config.UserService;
+import com.ddlabs.atlassian.api.HttpClient;
+import com.ddlabs.atlassian.impl.data.adapter.entity.ServerConfigRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,7 +26,7 @@ class OAuth2AuthorizationServiceImplTest{
     @Mock
     private HttpClient connectionFactory;
     @Mock
-    private PluginDaoRepository pluginDaoRepository;
+    private ServerConfigRepository pluginDaoRepository;
     @Mock
     private UserService userService;
     @Mock

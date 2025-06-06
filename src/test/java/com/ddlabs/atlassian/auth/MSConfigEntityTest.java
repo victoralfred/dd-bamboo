@@ -1,5 +1,5 @@
 package com.ddlabs.atlassian.auth;
-import com.ddlabs.atlassian.data.entity.MSConfigEntity;
+import com.ddlabs.atlassian.impl.data.adapter.entity.MSConfigEntity;
 import net.java.ao.EntityManager;
 import net.java.ao.RawEntity;
 import java.beans.PropertyChangeListener;

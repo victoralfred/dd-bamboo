@@ -1,5 +1,8 @@
 package com.ddlabs.atlassian.metrics.model;
 
+import com.ddlabs.atlassian.impl.metrics.model.BuildTag;
+import com.ddlabs.atlassian.impl.metrics.model.MetricType;
+import com.ddlabs.atlassian.impl.metrics.model.SeriesBuilder;
 import junit.framework.TestCase;
 
 public class SeriesBuilderTest extends TestCase {

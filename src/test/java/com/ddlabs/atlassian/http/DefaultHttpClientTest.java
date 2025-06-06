@@ -1,10 +1,9 @@
 package com.ddlabs.atlassian.http;
 
-import com.ddlabs.atlassian.exception.ApiException;
-import com.ddlabs.atlassian.metrics.remote.datadog.MetricsApiProvider;
+import com.ddlabs.atlassian.impl.exception.ApiException;
+import com.ddlabs.atlassian.impl.http.DefaultHttpClient;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import static org.junit.Assert.*;

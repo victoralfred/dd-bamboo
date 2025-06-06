@@ -1,5 +1,6 @@
 package com.ddlabs.atlassian.auth;
 
+import com.ddlabs.atlassian.oauth2.OAuthPKCSCodeChallenge;
 import junit.framework.TestCase;
 
 import java.security.NoSuchAlgorithmException;

@@ -39,11 +39,11 @@
         <label key="Metric Servers"/>
         <link>/plugins/servlet/metrics</link>
     </web-item>
-    <servlet name="Metrics" key="metrics-config" class="com.ddlabs.atlassian.config.MetricServerConfiguration">
+    <servlet name="Metrics" key="metrics-config" class="com.ddlabs.atlassian.impl.config.MetricServerConfiguration">
         <description>Metrics Server Configuration</description>
         <url-pattern>/configure</url-pattern>
     </servlet>
-    <servlet name="Metrics" key="metrics-view" class="com.ddlabs.atlassian.config.MetricServerView">
+    <servlet name="Metrics" key="metrics-view" class="com.ddlabs.atlassian.impl.config.MetricServerView">
         <description>Metrics Server View</description>
         <url-pattern>/metrics</url-pattern>
     </servlet>
@@ -53,11 +53,11 @@
     </rest>
     <ao key="ao-module">
         <description>Active Objects service used by this Metrics Server configuration</description>
-        <entity>com.ddlabs.atlassian.data.entity.MSConfigEntity</entity>
-        <upgradeTask>com.ddlabs.atlassian.config.model.MetricsAOUpgradeTask001</upgradeTask>
+        <entity>com.ddlabs.atlassian.impl.data.adapter.entity.MSConfigEntity</entity>
+        <upgradeTask>com.ddlabs.atlassian.impl.config.model.MetricsAOUpgradeTask001</upgradeTask>
     </ao>
     <bambooEventListener key="metricsEventListeners" name="Collects Metrics Data"
-                         class="com.ddlabs.atlassian.events.MetricsPluginEventListeners">
+                         class="com.ddlabs.atlassian.impl.events.MetricsPluginEventListeners">
         <description>Listens for Bamboo events</description>
     </bambooEventListener>
 </atlassian-plugin>
