@@ -36,6 +36,6 @@ public class ServerConfigRepositoryImpl implements ServerConfigRepository {
 
     @Override
     public void delete(String serverType) throws DataAccessException {
-
+        pluginDaoRepository.deleteServerConfig(serverType);
     }
 }
