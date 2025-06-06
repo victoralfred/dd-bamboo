@@ -60,7 +60,7 @@ public class ServerConfigMapper {
         return dto;
     }
 
-    public static void dtoObjectTransformer(ServerConfigBuilder dto, String serverType, String serverName, String description, String clientId,
+    public void dtoObjectTransformer(ServerConfigBuilder dto, String serverType, String serverName, String description, String clientId,
                                             String clientSecret, String redirectUrl, String codeVerifier,
                                             String codeChallenge, Long codeCreationTime, Long codeExpirationTime,
                                             String apiEndpoint, String oauthEndpoint,

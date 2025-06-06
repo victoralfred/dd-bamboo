@@ -4,7 +4,7 @@ AJS.toInit (() => {
     const PLUGIN_BASE_URL = AJS.contextPath();
     const SERVER_CONFIG = PLUGIN_BASE_URL+ "/rest/metrics/1.0/discover";
     const SAVE_SERVER = PLUGIN_BASE_URL + "/rest/metrics/1.0/save";
-    const TEST_API_KEY_ENDPOINT = PLUGIN_BASE_URL + "/rest/metrics/1.0/test";
+    const TEST_API_KEY_ENDPOINT = PLUGIN_BASE_URL + "/rest/metrics/1.0/test/api/validate";
     const addServerSubmissionButton = AJS.$("#add-metrics-server");
     const serverType = AJS.$("#server-type");
     const redirectUrl = AJS.$("#redirect-url");
@@ -98,7 +98,7 @@ AJS.toInit (() => {
             contentType: "application/json",
             dataType: "json",
             data: JSON.stringify({
-                API_KEY: clientKey.val(),APP_KEY:clientSecret.val(), endpoint:apiEndpoint.val()
+                apiKey: clientKey.val(),appKey:clientSecret.val(), endpoint:apiEndpoint.val()
             }),
             success: (data) => {
                 messageFlag = AJS.flag({
@@ -106,6 +106,11 @@ AJS.toInit (() => {
                     body: 'API Key is valid',
                     close: "auto"
                 })
+                const {valid} = data
+                if(valid){
+                    testApikeyButton.hide();
+                    addServerSubmissionButton.show();
+                }
             },
             error: (data) => {
                 messageFlag = AJS.flag({
@@ -123,6 +128,8 @@ AJS.toInit (() => {
             const serverDescription = AJS.$("#server-description").val();
             const clientKey = AJS.$("#clientKey").val();
             const clientSecret = AJS.$("#clientSecret").val();
+            const toggleButton = AJS.$("#use-api-key-pass-or-oauth");
+            let checked  =  (toggleButton[0].checked);
             event.preventDefault();
             const validated = validateFields(serverName.trim(),
                 serverType.val().trim(), clientKey, clientKey);
@@ -140,7 +147,8 @@ AJS.toInit (() => {
                         tokenEndpoint: tokenEndpoint.val(),
                         oauthEndpoint: oauthEndpoint.val(),
                         apiEndpoint: apiEndpoint.val(),
-                        serverType: serverType.val()
+                        serverType: serverType.val(),
+                        oauthOrApiKey: checked ? "API_KEY" : "OAUTH"
                     }),
                     success: (data) => {
                         if(data){

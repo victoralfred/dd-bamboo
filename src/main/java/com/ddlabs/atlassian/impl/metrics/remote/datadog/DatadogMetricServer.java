@@ -1,17 +1,13 @@
 package com.ddlabs.atlassian.impl.metrics.remote.datadog;
 
+import com.ddlabs.atlassian.impl.config.model.*;
 import com.ddlabs.atlassian.impl.exception.*;
 import com.ddlabs.atlassian.oauth2.OAuthPKCSCodeChallenge;
 import com.ddlabs.atlassian.oauth2.model.OAuth2Configuration;
 import com.ddlabs.atlassian.oauth2.model.OAuth2TokenResponse;
 import com.ddlabs.atlassian.api.OAuth2Service;
 import com.ddlabs.atlassian.impl.config.UserService;
-import com.ddlabs.atlassian.impl.config.model.ConfigDefaults;
-import com.ddlabs.atlassian.impl.config.model.ServerBodyBuilder;
-import com.ddlabs.atlassian.impl.config.model.ServerConfigBody;
-import com.ddlabs.atlassian.impl.config.model.ServerConfigProperties;
 import com.ddlabs.atlassian.impl.data.adapter.dto.ServerConfigBuilder;
-import com.ddlabs.atlassian.impl.data.adapter.entity.MSConfigEntity;
 import com.ddlabs.atlassian.impl.data.adapter.dto.ServerConfigMapper;
 import com.ddlabs.atlassian.impl.data.adapter.entity.ServerConfigRepository;
 import com.ddlabs.atlassian.api.MetricsApiClient;
@@ -199,11 +195,23 @@ public class DatadogMetricServer implements MetricServer {
             ServerConfigProperties properties = prepareServerProperties(serverConfig);
             ValidationUtils.validateNotNull(properties, "Server properties cannot be null");
             ServerConfigBuilder configDTO = new ServerConfigBuilder();
-            serverConfigMapper.transForForAuthTokenRequest(configDTO,properties.getServerType(), properties.getServerName(),
-                    properties.getDescription(), properties.getClientId(), properties.getClientSecret(),
-                    properties.getRedirectUrl(), properties.getCodeVerifier(), properties.getCodeChallenge(),
-                    properties.getCodeCreationTime(), properties.getCodeExpirationTime(),properties.getApiEndpoint(),
-                    properties.getOauthEndpoint(), properties.getTokenEndpoint());
+            switch (serverConfig.getOauthOrApiKey()) {
+                case "API_KEY":
+                    serverConfigMapper.dtoObjectTransformer(configDTO,
+                            serverConfig.getServerType(),serverConfig.getServerName(),serverConfig.getDescription(),serverConfig.getClientKey(),
+                            serverConfig.getClientSecret(),"", "","",Instant.now().getEpochSecond(),
+                            -100L,serverConfig.getApiEndpoint(),serverConfig.getOauthEndpoint(),
+                            serverConfig.getTokenEndpoint(),"","","","", true, true,"","",
+                            serverConfig.getOauthOrApiKey(),"API_ACCESS_SCOPE",-100L);
+                    break;
+                case "OAUTH":
+                    serverConfigMapper.transForForAuthTokenRequest(configDTO,properties.getServerType(), properties.getServerName(),
+                            properties.getDescription(), properties.getClientId(), properties.getClientSecret(),
+                            properties.getRedirectUrl(), properties.getCodeVerifier(), properties.getCodeChallenge(),
+                            properties.getCodeCreationTime(), properties.getCodeExpirationTime(),properties.getApiEndpoint(),
+                            properties.getOauthEndpoint(), properties.getTokenEndpoint());
+                    break;
+            }
             serverConfigRepository.save(configDTO);
             
             return "Server configuration saved successfully.";

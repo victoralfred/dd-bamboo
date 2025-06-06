@@ -19,3 +19,14 @@
     align-items: center;
     padding: 10px;
 }
+/* these will only affect the button "at rest". */
+.green-button {
+    --aui-btn-bg: #36B37E;
+    --aui-btn-text: #FFF;
+    --aui-btn-border: #006644;
+}
+/* override hover styles in the same way if you want to ;) */
+.green-button:hover {
+    --aui-btn-bg: #FFF;
+    --aui-btn-text: #006644;
+}

@@ -1,37 +1,35 @@
 package com.ddlabs.atlassian.impl.metrics.remote.datadog;
 
 public class ValidateKeyModel {
-    private String API_KEY;
-    private String APP_KEY;
+    private String apiKey;
+    private String appKey;
     private String endpoint;
-
     public ValidateKeyModel() {
     }
-
     public ValidateKeyModel(String apiKey, String appKey, String endpoint) {
-        API_KEY = apiKey;
-        APP_KEY = appKey;
+        this.apiKey = apiKey;
+        this.appKey = appKey;
         this.endpoint = endpoint;
     }
 
-    public String getAPI_KEY() {
-        return API_KEY;
+    public String getApiKey() {
+        return apiKey;
     }
 
-    public String getAPP_KEY() {
-        return APP_KEY;
+    public void setApiKey(String apiKey) {
+        this.apiKey = apiKey;
+    }
+
+    public String getAppKey() {
+        return appKey;
+    }
+
+    public void setAppKey(String appKey) {
+        this.appKey = appKey;
     }
 
     public String getEndpoint() {
         return endpoint;
-    }
-
-    public void setAPI_KEY(String API_KEY) {
-        this.API_KEY = API_KEY;
-    }
-
-    public void setAPP_KEY(String APP_KEY) {
-        this.APP_KEY = APP_KEY;
     }
 
     public void setEndpoint(String endpoint) {

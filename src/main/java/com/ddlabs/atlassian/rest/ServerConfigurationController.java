@@ -79,15 +79,17 @@ public class ServerConfigurationController {
         return Response.ok(metricServer.deleteServer(serverType)).build();
     }
     @POST
-    @Path("test")
+    @Path("test/api/validate")
+    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.TEXT_PLAIN)
     public Response testConnection(ValidateKeyModel validateKeyModel, @Context HttpServletRequest req) {
         userService.isAuthenticatedUserAndAdmin();
-        ValidationUtils.validateNotEmpty(validateKeyModel.getAPI_KEY(), "API Key can not be empty");
-        ValidationUtils.validateNotEmpty(validateKeyModel.getAPP_KEY(), "App Key can not be empty");
+        ValidationUtils.validateNotEmpty(validateKeyModel.getApiKey(), "API Key can not be empty");
+        ValidationUtils.validateNotEmpty(validateKeyModel.getAppKey(), "App Key can not be empty");
         ValidationUtils.validateNotEmpty(validateKeyModel.getEndpoint(), "Endpoint can not be empty");
-        if(!httpClient.get(validateKeyModel).isEmpty()){
-            return Response.ok().build();
+        String result = httpClient.get(validateKeyModel);
+        if(!result.isEmpty()){
+            return Response.ok(result).build();
         }
         return Response.serverError().build();
 

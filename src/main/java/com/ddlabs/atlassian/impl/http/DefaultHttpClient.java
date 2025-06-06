@@ -43,9 +43,11 @@ public class DefaultHttpClient implements HttpClient {
         String fullUrl = validateKeyModel.getEndpoint() + "/api/v1/validate";
         try {
             HttpsURLConnection connection = openConnection(fullUrl, "GET");
-            connection.setRequestProperty("DD-API-KEY",  validateKeyModel.getAPI_KEY());
-            connection.setRequestProperty("DD-APP-KEY", validateKeyModel.getAPP_KEY());
-            return handleResponse(connection);
+            connection.setRequestProperty("DD-API-KEY",  validateKeyModel.getApiKey());
+            connection.setRequestProperty("DD-APP-KEY", validateKeyModel.getAppKey());
+            String response = handleResponse(connection);
+            LogUtils.logInfo(log, "Api key validated {} succeeded with response: {}", fullUrl, response);
+            return response;
         } catch (IOException | URISyntaxException e) {
             LogUtils.logError(log, "Error sending GET request to " + fullUrl, e);
             throw new ApiException(ErrorCode.API_CONNECTION_ERROR,

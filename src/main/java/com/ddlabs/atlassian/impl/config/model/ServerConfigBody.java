@@ -10,6 +10,7 @@ public class ServerConfigBody {
     private String serverName;
     private String serverType;
     private String tokenEndpoint;
+    private String oauthOrApiKey;
     public ServerConfigBody() {}
     // Getters and setters for each field
 
@@ -85,6 +86,12 @@ public class ServerConfigBody {
         this.tokenEndpoint = tokenEndpoint;
     }
 
+    public String getOauthOrApiKey() {
+        return oauthOrApiKey;
+    }
+    public void setOauthOrApiKey(String oauthOrApiKey) {
+        this.oauthOrApiKey = oauthOrApiKey;
+    }
     @Override
     public String toString() {
         return "ServerConfigBody{" +
@@ -97,6 +104,7 @@ public class ServerConfigBody {
                 ", serverName='" + serverName + '\'' +
                 ", serverType='" + serverType + '\'' +
                 ", tokenEndpoint='" + tokenEndpoint + '\'' +
+                ", oauthOrApiKey='" + oauthOrApiKey + '\'' +
                 '}';
     }
 }
