@@ -12,8 +12,8 @@ AJS.toInit (() => {
     const oauthEndpoint = AJS.$("#oauth-endpoint");
     const apiEndpoint = AJS.$("#api-endpoint");
     const infoPanel = AJS.$(".aui-message-info");
-    const clientKey = AJS.$("#clientKey").val();
-    const clientSecret = AJS.$("#clientSecret").val();
+    const clientKey = AJS.$("#clientKey")
+    const clientSecret = AJS.$("#clientSecret")
     const clientIdDescription = AJS.$("#api-key-description,#api-key-description");
     const clientSecreteDescription = AJS.$("#client-secret-description,#client-secret-description");
     const urlPattern = /^(https:\/\/)([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/[a-zA-Z0-9\-._~:/?#[\]@!$&'()*+,;=%]*)*(\?client_id=[^&]+&redirect_uri=[^&]+&response_type=[^&]+.*)?$/;
@@ -91,11 +91,12 @@ AJS.toInit (() => {
         }
     });
     testApikeyButton.click((e) => {
-
         e.preventDefault();
         AJS.$.ajax(({
             url: TEST_API_KEY_ENDPOINT,
             method: "POST",
+            contentType: "application/json",
+            dataType: "json",
             data: JSON.stringify({
                 API_KEY: clientKey.val(),APP_KEY:clientSecret.val(), endpoint:apiEndpoint.val()
             }),

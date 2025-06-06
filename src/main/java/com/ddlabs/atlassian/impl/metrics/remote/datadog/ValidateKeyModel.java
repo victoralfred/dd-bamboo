@@ -1,9 +1,12 @@
 package com.ddlabs.atlassian.impl.metrics.remote.datadog;
 
 public class ValidateKeyModel {
-    private final String API_KEY;
-    private final String APP_KEY;
-    private final String endpoint;
+    private String API_KEY;
+    private String APP_KEY;
+    private String endpoint;
+
+    public ValidateKeyModel() {
+    }
 
     public ValidateKeyModel(String apiKey, String appKey, String endpoint) {
         API_KEY = apiKey;
@@ -21,5 +24,17 @@ public class ValidateKeyModel {
 
     public String getEndpoint() {
         return endpoint;
+    }
+
+    public void setAPI_KEY(String API_KEY) {
+        this.API_KEY = API_KEY;
+    }
+
+    public void setAPP_KEY(String APP_KEY) {
+        this.APP_KEY = APP_KEY;
+    }
+
+    public void setEndpoint(String endpoint) {
+        this.endpoint = endpoint;
     }
 }
