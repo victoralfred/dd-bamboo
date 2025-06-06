@@ -82,8 +82,10 @@
             </div>
             <div class="aui-message aui-message-info">
                 <p class="title">Note:</p>
-                <p id="server-type-text"></p>
-                <button type="submit" value="Save" class="aui-button
+                <p id="server-type-text"></p><br>
+                <button type="submit" class="aui-button
+                aui-button-primary" id="test-api-key">Test API Key</button>
+                <button type="submit"  class="aui-button
                 aui-button-primary" id="add-metrics-server">Save Server</button>
             </div>
         </div>

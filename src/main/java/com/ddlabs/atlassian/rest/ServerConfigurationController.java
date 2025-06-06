@@ -1,8 +1,11 @@
 package com.ddlabs.atlassian.rest;
 
+import com.ddlabs.atlassian.api.HttpClient;
 import com.ddlabs.atlassian.impl.config.UserService;
 import com.ddlabs.atlassian.impl.config.model.ServerConfigBody;
 import com.ddlabs.atlassian.impl.config.model.ServerType;
+import com.ddlabs.atlassian.impl.metrics.remote.datadog.ValidateKeyModel;
+import com.ddlabs.atlassian.util.ValidationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.ddlabs.atlassian.api.MetricServer;
@@ -22,11 +25,13 @@ public class ServerConfigurationController {
     private static final Logger log = LoggerFactory.getLogger(ServerConfigurationController.class);
     private final MetricServerFactory metricServerFactory;
     private final UserService userService;
+    private final HttpClient httpClient;
     @Inject
     public ServerConfigurationController(MetricServerFactory metricServerFactory,
-                                         UserService userService) {
+                                         UserService userService, HttpClient httpClient) {
         this.metricServerFactory = metricServerFactory;
         this.userService = userService;
+        this.httpClient = httpClient;
     }
     @GET
     @Path("authorize/{serverType}")
@@ -73,7 +78,20 @@ public class ServerConfigurationController {
         MetricServer metricServer = metricServerFactory.getMetricServer(serverType);
         return Response.ok(metricServer.deleteServer(serverType)).build();
     }
+    @POST
+    @Path("test")
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response testConnection(ValidateKeyModel validateKeyModel, @Context HttpServletRequest req) {
+        userService.isAuthenticatedUserAndAdmin();
+        ValidationUtils.validateNotEmpty(validateKeyModel.getAPI_KEY(), "API Key can not be empty");
+        ValidationUtils.validateNotEmpty(validateKeyModel.getAPP_KEY(), "App Key can not be empty");
+        ValidationUtils.validateNotEmpty(validateKeyModel.getEndpoint(), "Endpoint can not be empty");
+        if(!httpClient.get(validateKeyModel).isEmpty()){
+            return Response.ok().build();
+        }
+        return Response.serverError().build();
 
+    }
     /**
      * Extracts the server type from the provided server URL.
      * The server type is determined by the first part of the URL before the first dot.

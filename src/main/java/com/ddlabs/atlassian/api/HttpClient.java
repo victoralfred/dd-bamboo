@@ -1,6 +1,7 @@
 package com.ddlabs.atlassian.api;
 
 import com.ddlabs.atlassian.impl.exception.ApiException;
+import com.ddlabs.atlassian.impl.metrics.remote.datadog.ValidateKeyModel;
 
 /**
  * Interface for HTTP client operations.
@@ -25,7 +26,15 @@ public interface HttpClient {
      * @throws ApiException If an error occurs
      */
     String get(String url, String queryParams) throws ApiException;
-    
+
+    /**
+     * Method used for validating API keys
+     * @param validateKeyModel validation body
+     * @return success/failure
+     * @throws ApiException If an error occurs
+     */
+    String get(ValidateKeyModel validateKeyModel) throws ApiException;
+
     /**
      * Sends a POST request to the specified URL with the specified body.
      *

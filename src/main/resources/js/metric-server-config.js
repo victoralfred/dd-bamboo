@@ -4,6 +4,7 @@ AJS.toInit (() => {
     const PLUGIN_BASE_URL = AJS.contextPath();
     const SERVER_CONFIG = PLUGIN_BASE_URL+ "/rest/metrics/1.0/discover";
     const SAVE_SERVER = PLUGIN_BASE_URL + "/rest/metrics/1.0/save";
+    const TEST_API_KEY_ENDPOINT = PLUGIN_BASE_URL + "/rest/metrics/1.0/test";
     const addServerSubmissionButton = AJS.$("#add-metrics-server");
     const serverType = AJS.$("#server-type");
     const redirectUrl = AJS.$("#redirect-url");
@@ -11,13 +12,17 @@ AJS.toInit (() => {
     const oauthEndpoint = AJS.$("#oauth-endpoint");
     const apiEndpoint = AJS.$("#api-endpoint");
     const infoPanel = AJS.$(".aui-message-info");
+    const clientKey = AJS.$("#clientKey").val();
+    const clientSecret = AJS.$("#clientSecret").val();
     const clientIdDescription = AJS.$("#api-key-description,#api-key-description");
     const clientSecreteDescription = AJS.$("#client-secret-description,#client-secret-description");
     const urlPattern = /^(https:\/\/)([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/[a-zA-Z0-9\-._~:/?#[\]@!$&'()*+,;=%]*)*(\?client_id=[^&]+&redirect_uri=[^&]+&response_type=[^&]+.*)?$/;
     const httpsUrlPattern = /^https:\/\/([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,6}(:\d+)?(\/[^\s]*)?$/;
     const serverConfigurationForn = AJS.$("#metrics-server-config");
+    const testApikeyButton = AJS.$("#test-api-key");
     // Hide the add server button initially
     addServerSubmissionButton.hide();
+    testApikeyButton.hide();
     // Hide the info panel initially
     infoPanel.hide();
     serverConfigurationForn.change((event) => {
@@ -28,12 +33,16 @@ AJS.toInit (() => {
             infoPanel.show();
             AJS.$('#server-type-text').html('You API key and secret will be used to authenticate with the server.')
             // Show the add server button when the key type is selected
-            addServerSubmissionButton.show();
+            testApikeyButton.show();
+            addServerSubmissionButton.hide();
+
         }else{
             infoPanel.show();
             AJS.$("#server-type-text").html('After saving the server, you will need to authorize it by clicking the "Authorize" button.')
             // Show the add server button when the key type is selected
             addServerSubmissionButton.show();
+            testApikeyButton.hide();
+
         }
         clientIdDescription.html(checked ? 'API Key':'Client ID' );
         clientSecreteDescription.html(checked ?  'App Key': 'Client Secret' );
@@ -81,7 +90,31 @@ AJS.toInit (() => {
             }))
         }
     });
+    testApikeyButton.click((e) => {
 
+        e.preventDefault();
+        AJS.$.ajax(({
+            url: TEST_API_KEY_ENDPOINT,
+            method: "POST",
+            data: JSON.stringify({
+                API_KEY: clientKey.val(),APP_KEY:clientSecret.val(), endpoint:apiEndpoint.val()
+            }),
+            success: (data) => {
+                messageFlag = AJS.flag({
+                    type: "success",
+                    body: 'API Key is valid',
+                    close: "auto"
+                })
+            },
+            error: (data) => {
+                messageFlag = AJS.flag({
+                    type: "error",
+                    body: 'API Key is invalid',
+                    close: "auto"
+                })
+            }
+        }))
+    })
     if (addServerSubmissionButton.length) {
         addServerSubmissionButton.click((event) => {
             const serverType = AJS.$("#server-type");
@@ -167,62 +200,6 @@ AJS.toInit (() => {
             }
         });
     }
-    AJS.$("#test-oauth").click((event) => {
-        event.preventDefault();
-        const serverId = AJS.$("#test-oauth").data("server-id");
-        if (serverId) {
-            const API_TEST = PLUGIN_BASE_URL + "/rest/metrics/1.0/kpi/" + serverId.trim();
-            AJS.$.ajax({
-                url: API_TEST,
-                type: "GET",
-                success: (data) => {
-                    if (data) {
-                        messageFlag = AJS.flag({
-                            type: "success",
-                            body: 'API is working',
-                            close: "auto"
-                        })
-                        AJS.$("table#metrics-server-status-table").load(window.location.href + " table#metrics-server-status-table")
-                    } else {
-                        messageFlag = AJS.flag({
-                            type: "error",
-                            body: 'Error when testing API',
-                            close: "auto"
-                        })
-                    }
-                },
-                error: (data) => {
-                    if (data.status === 400) {
-                        messageFlag = AJS.flag({
-                            type: "error",
-                            body: 'Invalid URL or parameters',
-                            close: "auto"
-                        })
-                    } else if (data.status === 500) {
-                        messageFlag = AJS.flag({
-                            type: "error",
-                            body: 'Internal server error',
-                            close: "auto"
-                        })
-                    }else {
-                        messageFlag = AJS.flag({
-                            type: "error",
-                            body: 'Error when testing API',
-                            close: "auto"
-                        })
-                    }
-                }
-            })
-
-        }else{
-            messageFlag = AJS.flag({
-                type: "error",
-                body: 'Failed to retrieve token',
-                close: "auto"
-            })
-        }
-
-    })
 })
 
 const validateFields = (serverName, serverType,

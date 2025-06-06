@@ -3,6 +3,7 @@ package com.ddlabs.atlassian.impl.http;
 import com.ddlabs.atlassian.api.HttpClient;
 import com.ddlabs.atlassian.impl.exception.ApiException;
 import com.ddlabs.atlassian.impl.exception.ErrorCode;
+import com.ddlabs.atlassian.impl.metrics.remote.datadog.ValidateKeyModel;
 import com.ddlabs.atlassian.util.LogUtils;
 import com.google.gson.Gson;
 import org.slf4j.Logger;
@@ -37,20 +38,34 @@ public class DefaultHttpClient implements HttpClient {
     public String get(String url) throws ApiException {
         return get(url, null);
     }
-    
+    @Override
+    public String get(ValidateKeyModel validateKeyModel) throws ApiException {
+        String fullUrl = validateKeyModel.getEndpoint() + "/api/v1/validate";
+        try {
+            HttpsURLConnection connection = openConnection(fullUrl, "GET");
+            connection.setRequestProperty("DD-API-KEY",  validateKeyModel.getAPI_KEY());
+            connection.setRequestProperty("DD-APP-KEY", validateKeyModel.getAPP_KEY());
+            return handleResponse(connection);
+        } catch (IOException | URISyntaxException e) {
+            LogUtils.logError(log, "Error sending GET request to " + fullUrl, e);
+            throw new ApiException(ErrorCode.API_CONNECTION_ERROR,
+                    "Error sending GET request to " + fullUrl,
+                    "Failed to connect to the API", e);
+        }
+    }
     @Override
     public String get(String url, String queryParams) throws ApiException {
         try {
-            String fullUrl = queryParams != null && !queryParams.isEmpty() 
-                    ? url + (url.contains("?") ? "&" : "?") + queryParams 
+            String fullUrl = queryParams != null && !queryParams.isEmpty()
+                    ? url + (url.contains("?") ? "&" : "?") + queryParams
                     : url;
-            
+
             HttpsURLConnection connection = openConnection(fullUrl, "GET");
             return handleResponse(connection);
         } catch (IOException | URISyntaxException e) {
             LogUtils.logError(log, "Error sending GET request to " + url, e);
-            throw new ApiException(ErrorCode.API_CONNECTION_ERROR, 
-                    "Error sending GET request to " + url, 
+            throw new ApiException(ErrorCode.API_CONNECTION_ERROR,
+                    "Error sending GET request to " + url,
                     "Failed to connect to the API", e);
         }
     }
