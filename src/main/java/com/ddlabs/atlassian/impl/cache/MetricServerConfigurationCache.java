@@ -46,6 +46,7 @@ public class MetricServerConfigurationCache {
         return Optional.ofNullable(CACHE.get(serverType));
     }
     public void updateServerConfig(String serverType) {
+        LogUtils.logInfo(log, "Updating cache for server type {}", serverType);
         int size = Optional.ofNullable(serverConfigRepository.findByServerType(serverType))
                 .stream().map(result->CACHE.put(serverType, result))
                 .toList().size();

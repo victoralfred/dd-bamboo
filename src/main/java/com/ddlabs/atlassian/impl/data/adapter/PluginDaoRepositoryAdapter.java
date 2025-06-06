@@ -4,6 +4,7 @@ import com.atlassian.activeobjects.external.ActiveObjects;
 import com.atlassian.activeobjects.tx.Transactional;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 
+import com.ddlabs.atlassian.impl.cache.MetricServerConfigurationCache;
 import com.ddlabs.atlassian.impl.data.adapter.dto.ServerConfigBuilder;
 import com.ddlabs.atlassian.impl.data.adapter.entity.MSConfigEntity;
 import com.ddlabs.atlassian.impl.data.adapter.dto.ServerConfigMapper;
@@ -34,10 +35,12 @@ public final class PluginDaoRepositoryAdapter {
     @ComponentImport
     private final ActiveObjects ao;
     private final ServerConfigMapper serverConfigMapper;
-    public PluginDaoRepositoryAdapter(TokenStore tokenStore, ActiveObjects ao, ServerConfigMapper serverConfigMapper) {
+    private final MetricServerConfigurationCache metricServerConfigurationCache;
+    public PluginDaoRepositoryAdapter(TokenStore tokenStore, ActiveObjects ao, ServerConfigMapper serverConfigMapper, MetricServerConfigurationCache metricServerConfigurationCache) {
         this.tokenStore = tokenStore;
         this.ao = ValidationUtils.validateNotNull(ao, "ActiveObjects cannot be null");
         this.serverConfigMapper = serverConfigMapper;
+        this.metricServerConfigurationCache = metricServerConfigurationCache;
     }
     public String saveServerConfig(ServerConfigBuilder properties) {
         final MSConfigEntity serverConfig = ao.create(MSConfigEntity.class);
@@ -58,6 +61,7 @@ public final class PluginDaoRepositoryAdapter {
             serverConfig.setOauthEndpoint(properties.getOauthEndpoint());
             serverConfig.setTokenEndpoint(properties.getTokenEndpoint());
             serverConfig.save();
+            metricServerConfigurationCache.updateServerConfig(properties.getServerType());
             log.info("Server configuration saved for server: {}", properties.getServerName());
             return "Server configuration saved successfully.";
         } catch (Exception e) {
@@ -98,6 +102,7 @@ public final class PluginDaoRepositoryAdapter {
         config[0].save();
         tokenStore.removeToken("datadog_access_token");
         tokenStore.putToken("datadog_access_token", serverConfig.getAccessToken());
+        metricServerConfigurationCache.updateServerConfig(config[0].getServerType());
     }
     public List<ServerConfigBuilder> getAllServerConfigs() {
         try {
