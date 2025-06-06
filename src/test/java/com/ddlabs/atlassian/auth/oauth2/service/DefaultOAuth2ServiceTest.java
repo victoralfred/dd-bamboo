@@ -1,14 +1,19 @@
 package com.ddlabs.atlassian.auth.oauth2.service;
 
-import com.ddlabs.atlassian.auth.oauth2.model.OAuth2Configuration;
-import com.ddlabs.atlassian.auth.oauth2.model.OAuth2TokenResponse;
-import com.ddlabs.atlassian.exception.AuthenticationException;
-import com.ddlabs.atlassian.http.HttpClient;
+import com.ddlabs.atlassian.impl.config.UserService;
+import com.ddlabs.atlassian.impl.data.adapter.entity.ServerConfigRepository;
+import com.ddlabs.atlassian.oauth2.OAuth2AuthorizationServiceImpl;
+import com.ddlabs.atlassian.oauth2.model.OAuth2Configuration;
+import com.ddlabs.atlassian.oauth2.model.OAuth2TokenResponse;
+import com.ddlabs.atlassian.impl.exception.AuthenticationException;
+import com.ddlabs.atlassian.api.HttpClient;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 
 import static org.junit.Assert.*;
@@ -17,18 +22,20 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 public class DefaultOAuth2ServiceTest {
-
-    private DefaultOAuth2Service oauth2Service;
-    
+    private OAuth2AuthorizationServiceImpl oauth2Service;
     @Mock
     private HttpClient httpClient;
-    
+    @Mock
+    private  ServerConfigRepository serverConfigRepository;
+    private  UserService userService;
+    @Mock
     private OAuth2Configuration testConfig;
     
     @Before
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        oauth2Service = new DefaultOAuth2Service(httpClient);
+        oauth2Service = new OAuth2AuthorizationServiceImpl(httpClient,
+                serverConfigRepository, userService);
         
         testConfig = new OAuth2Configuration();
         testConfig.setClientId("test-client-id");
@@ -40,18 +47,16 @@ public class DefaultOAuth2ServiceTest {
         testConfig.setCodeChallengeMethod("S256");
         testConfig.setCodeVerifier("test-code-verifier");
     }
-    
     @Test
     public void testGenerateAuthorizationUrl() throws AuthenticationException {
         String authUrl = oauth2Service.generateAuthorizationUrl(testConfig);
-        
         assertNotNull(authUrl);
         assertTrue(authUrl.startsWith(testConfig.getAuthEndpoint()));
-        assertTrue(authUrl.contains("client_id=" + testConfig.getClientId()));
-        assertTrue(authUrl.contains("redirect_uri=" + testConfig.getRedirectUri()));
-        assertTrue(authUrl.contains("response_type=code"));
-        assertTrue(authUrl.contains("code_challenge=" + testConfig.getCodeChallenge()));
-        assertTrue(authUrl.contains("code_challenge_method=" + testConfig.getCodeChallengeMethod()));
+        assertTrue(authUrl.contains("redirect_uri=" +  URLEncoder.encode(testConfig.getRedirectUri(), StandardCharsets.UTF_8)));
+        assertTrue(authUrl.contains("&client_id=" + URLEncoder.encode(testConfig.getClientId(), StandardCharsets.UTF_8)));
+        assertTrue(authUrl.contains("&response_type=code"));
+        assertTrue(authUrl.contains("&code_challenge=" + URLEncoder.encode(testConfig.getCodeChallenge(), StandardCharsets.UTF_8)));
+        assertTrue(authUrl.contains("&code_challenge_method=" + URLEncoder.encode(testConfig.getCodeChallengeMethod(), StandardCharsets.UTF_8)));
     }
 
     @Test
@@ -89,7 +94,7 @@ public class DefaultOAuth2ServiceTest {
         assertFalse(oauth2Service.isAccessTokenExpired(validTime));
     }
     
-
+    @Test
     public void testIsTokenExpired() {
         OAuth2TokenResponse expiredToken = new OAuth2TokenResponse();
         expiredToken.setAccessTokenExpiry(Instant.now().minusSeconds(1).getEpochSecond());

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="decorator" content="atl.admin">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    $webResourceManager.requireResource("com.ddlabs.atlassian.dd-bamboo-metrics:dd-bamboo-metrics-resources")
+    $webResourceManager.requireResource("com.ddlabs.atlassian.dd-bamboo-metrics:dd-bamboo-metrics-resources-view")
 </head>
 <body>
     <div id="toolbar">

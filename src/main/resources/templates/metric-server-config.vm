@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="decorator" content="atl.admin">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    $webResourceManager.requireResource("com.ddlabs.atlassian.dd-bamboo-metrics:dd-bamboo-metrics-resources")
+    $webResourceManager.requireResource("com.ddlabs.atlassian.dd-bamboo-metrics:dd-bamboo-metrics-resources-configure")
 </head>
 <body>
 <div id="page_wrapper">
     <h1>$i18n.getText("application.configuration.header")</h1>
 </div>
-<div>
+<div class="oauth-form-setup">
     <div class="aui">
         <br>
         <h2>$i18n.getText("application.servers.add")</h2>
@@ -38,16 +38,16 @@
             <div class="description">$i18n.getText("application.servers.description")</div>
         </div>
         <div class="field-group">
-            <label for="clientKey">Client ID</label>
+            <label for="clientKey" id="api-key-description"><span>Client ID</span></label>
             <input class="text medium-long-field" type="text" id="clientKey" name="clientKey"
                    data-aui-validation-field  data-aui-validation-required="true" autocomplete="true">
-            <div class="description">Client ID</div>
+            <div class="description" id="api-key-description">Client ID</div>
         </div>
         <div class="field-group">
-            <label for="clientSecret">Client Secret</label>
+            <label for="clientSecret" id="client-secret-description">Client Secret</label>
             <input class="text medium-long-field" type="text" id="clientSecret" name="clientSecret"
                    data-aui-validation-field  data-aui-validation-required="true">
-            <div class="description">Client Secret</div>
+            <div class="description" id="client-secret-description">Client Secret</div>
         </div>
         <div class="field-group">
             <label for="oauth-endpoint">Authorization Endpoint</label>
@@ -59,7 +59,7 @@
             <label for="api-endpoint">API Endpoint</label>
             <input class="text medium-long-field" type="text" id="api-endpoint" name="api-endpoint"
                    data-aui-validation-field  data-aui-validation-required="true">
-            <div class="description">API Endpoint</div>
+            <div class="description api-key-description">API Endpoint</div>
         </div>
         <div class="field-group">
             <label for="token-endpoint">Token Endpoint</label>
@@ -73,9 +73,16 @@
                    data-aui-validation-field  data-aui-validation-required="true">
             <div class="description">Redirect URL</div>
         </div>
-        <input type="hidden" name="atl_token" id="atl_token" value="$atl_token"/>
         <div class="buttons-container">
-            <div class="buttons">
+            <div>
+                <div class="select-auth-method"></div>
+                <div class="description">Choose Authentication Type</div>
+                    <aui-toggle id="use-api-key-pass-or-oauth"
+                                label="API key or Oauth"></aui-toggle>
+            </div>
+            <div class="aui-message aui-message-info">
+                <p class="title">Note:</p>
+                <p id="server-type-text"></p>
                 <button type="submit" value="Save" class="aui-button
                 aui-button-primary" id="add-metrics-server">Save Server</button>
             </div>

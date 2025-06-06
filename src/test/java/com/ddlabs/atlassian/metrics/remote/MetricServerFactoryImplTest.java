@@ -1,21 +1,22 @@
 package com.ddlabs.atlassian.metrics.remote;
 
-import com.ddlabs.atlassian.auth.oauth2.service.OAuth2Service;
-import com.ddlabs.atlassian.config.UserService;
-import com.ddlabs.atlassian.config.model.ServerBodyBuilder;
-import com.ddlabs.atlassian.data.mapper.ServerConfigMapper;
-import com.ddlabs.atlassian.data.repository.ServerConfigRepository;
-import com.ddlabs.atlassian.metrics.api.factory.MetricsApiClientFactory;
-import com.ddlabs.atlassian.metrics.remote.datadog.DatadogMetricServer;
+import com.ddlabs.atlassian.api.MetricServer;
+import com.ddlabs.atlassian.api.MetricServerFactory;
+import com.ddlabs.atlassian.api.OAuth2Service;
+import com.ddlabs.atlassian.impl.config.UserService;
+import com.ddlabs.atlassian.impl.config.model.ServerBodyBuilder;
+import com.ddlabs.atlassian.impl.data.adapter.dto.ServerConfigMapper;
+import com.ddlabs.atlassian.impl.data.adapter.entity.ServerConfigRepository;
+import com.ddlabs.atlassian.impl.metrics.api.factory.MetricsApiClientFactory;
+import com.ddlabs.atlassian.impl.metrics.remote.MetricServerFactoryImpl;
+import com.ddlabs.atlassian.impl.metrics.remote.datadog.DatadogMetricServer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
