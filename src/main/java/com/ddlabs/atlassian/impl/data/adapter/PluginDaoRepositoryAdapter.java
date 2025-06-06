@@ -52,8 +52,8 @@ public final class PluginDaoRepositoryAdapter {
             serverConfig.setDescription(properties.getDescription());
             serverConfig.setCodeExpirationTime(properties.getCodeExpirationTime());
             serverConfig.setCodeCreationTime(properties.getCodeCreationTime());
-            serverConfig.setConfigured(false);
-            serverConfig.setEnabled(false);
+            serverConfig.setConfigured(properties.isConfigured());
+            serverConfig.setEnabled(properties.isEnabled());
             serverConfig.setApiEndpoint(properties.getApiEndpoint());
             serverConfig.setOauthEndpoint(properties.getOauthEndpoint());
             serverConfig.setTokenEndpoint(properties.getTokenEndpoint());
