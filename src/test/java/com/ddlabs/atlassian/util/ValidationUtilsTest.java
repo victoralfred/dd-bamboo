@@ -1,11 +1,10 @@
 package com.ddlabs.atlassian.util;
 
-import com.ddlabs.atlassian.exception.ValidationException;
-import com.ddlabs.atlassian.metrics.remote.MockedClass;
+import com.ddlabs.atlassian.impl.exception.ValidationException;
 import org.junit.jupiter.api.Test;
+import ut.com.ddlabs.atlassian.metrics.remote.MockedClass;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.BDDMockito.given;
 
 class ValidationUtilsTest {
     @Test
