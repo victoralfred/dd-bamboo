@@ -1,7 +1,7 @@
 package com.ddlabs.atlassian.api;
 
 import com.ddlabs.atlassian.impl.exception.ApiException;
-import com.ddlabs.atlassian.impl.metrics.remote.datadog.ValidateKeyModel;
+import com.ddlabs.atlassian.impl.config.model.APIAuthenticationType;
 
 /**
  * Interface for HTTP client operations.
@@ -29,11 +29,11 @@ public interface HttpClient {
 
     /**
      * Method used for validating API keys
-     * @param validateKeyModel validation body
+     * @param APIAuthenticationType validation body
      * @return success/failure
      * @throws ApiException If an error occurs
      */
-    String get(ValidateKeyModel validateKeyModel) throws ApiException;
+    String get(APIAuthenticationType APIAuthenticationType) throws ApiException;
 
     /**
      * Sends a POST request to the specified URL with the specified body.
@@ -73,7 +73,8 @@ public interface HttpClient {
      * @param url The URL to send the request to
      * @param seriesPoint The series point to include in the request body
      * @param contentType The content type of the request
-     * @param authToken The authentication token for the Datadog metric server
+     * @param apiKey The authentication token for the Datadog metric server
+     * @param appKey The application key for the Datadog metric server
      */
-    void post(String url, String seriesPoint, String contentType, String authToken) throws ApiException;
+    void post(String url, String seriesPoint, String contentType, String apiKey, String appKey) throws ApiException;
 }

@@ -40,7 +40,7 @@
                 <tr>
                     <td>$server.serverName</td>
                     <td>
-                        #if ($server.authentication != true)
+                        #if ($server.enabled != true)
                             <button class="aui-button green-button" id="connect-metrics-server-oauth"
                                     data-server-id="$server.serverType">Authorize</button>
                         #else

@@ -40,10 +40,9 @@ public interface MetricServer {
      * @param serverType The type of the server (e.g., Datadog, NewRelic).
      * @param response   The response containing the access token and other metadata.
      * @param req        The HTTP request containing additional parameters if needed.
-     * @return A message indicating the result of the save operation.
      * @throws NullOrEmptyFieldsException if any required fields are null or empty.
      */
-    String saveServerMetadata(String  serverType, String response, HttpServletRequest req) throws NullOrEmptyFieldsException;
+    void saveServerMetadata(String  serverType, String response, HttpServletRequest req) throws NullOrEmptyFieldsException;
     /**
      * Retrieves the default configuration settings for the metric server.
      *

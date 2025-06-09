@@ -7,10 +7,10 @@ import com.ddlabs.atlassian.oauth2.model.GrantType;
 import com.ddlabs.atlassian.oauth2.model.OAuth2Configuration;
 import com.ddlabs.atlassian.oauth2.model.OAuth2TokenResponse;
 import com.ddlabs.atlassian.impl.config.UserService;
-import com.ddlabs.atlassian.impl.data.adapter.dto.ServerConfigBuilder;
+import com.ddlabs.atlassian.dao.adapter.dto.ServerConfigBuilder;
 import com.ddlabs.atlassian.api.HttpClient;
 import com.ddlabs.atlassian.api.MetricServer;
-import com.ddlabs.atlassian.impl.data.adapter.entity.ServerConfigRepository;
+import com.ddlabs.atlassian.dao.adapter.entity.ConfigRepository;
 import com.ddlabs.atlassian.impl.exception.AuthenticationException;
 import com.ddlabs.atlassian.impl.exception.ErrorCode;
 import com.ddlabs.atlassian.impl.exception.NullOrEmptyFieldsException;
@@ -30,14 +30,14 @@ import java.util.Locale;
 public class OAuth2AuthorizationServiceImpl implements OAuth2Service {
     private static final Logger log = LoggerFactory.getLogger(OAuth2AuthorizationServiceImpl.class);
     private final HttpClient httpClient;
-    private final ServerConfigRepository serverConfigRepository;
+    private final ConfigRepository configRepository;
     private final UserService userService;
 
     public OAuth2AuthorizationServiceImpl(HttpClient httpClient,
-                                          ServerConfigRepository serverConfigRepository,
+                                          ConfigRepository configRepository,
                                          UserService userService) {
         this.httpClient = httpClient;
-        this.serverConfigRepository = serverConfigRepository;
+        this.configRepository = configRepository;
         this.userService = userService;
     }
     @Override
@@ -62,7 +62,7 @@ public class OAuth2AuthorizationServiceImpl implements OAuth2Service {
     public void refreshToken(MetricServer metricServer) throws Exception {
         Assert.notNull(metricServer, "Server type cannot be null");
         String serverType = metricServer.getClass().getSimpleName();
-         ServerConfigBuilder serverConfigBuilder =  serverConfigRepository.findByServerType(serverType);
+         ServerConfigBuilder serverConfigBuilder =  configRepository.findByServerType(serverType);
         if (serverConfigBuilder==null) {
             log.warn("No configuration found for server: {}", serverType);
             return;
@@ -168,7 +168,7 @@ public class OAuth2AuthorizationServiceImpl implements OAuth2Service {
                     msConfigEntity.getTokenEndpoint()
             );
             updateConfigWithNewTokens(msConfigEntity, response);
-            serverConfigRepository.update(msConfigEntity);
+            configRepository.update(msConfigEntity);
         } catch (Exception e) {
             log.error("Failed to refresh access token for server: {}", serverType, e);
             throw new Exception("Failed to refresh access token for server: " + serverType, e);

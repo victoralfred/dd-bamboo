@@ -1,9 +1,9 @@
 package com.ddlabs.atlassian.api;
 
 import com.ddlabs.atlassian.impl.exception.MetricsApiException;
-import com.ddlabs.atlassian.impl.metrics.api.model.MetricData;
-import com.ddlabs.atlassian.impl.metrics.api.model.MetricQuery;
-import com.ddlabs.atlassian.impl.metrics.api.model.MetricSeries;
+import com.ddlabs.atlassian.impl.metrics.model.MetricData;
+import com.ddlabs.atlassian.impl.metrics.model.MetricQuery;
+import com.ddlabs.atlassian.impl.metrics.model.MetricSeries;
 
 import java.util.List;
 

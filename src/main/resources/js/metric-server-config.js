@@ -174,7 +174,9 @@ AJS.toInit (() => {
                             apiEndpoint.prop("readonly", false);
                             serverType.change();
                             // Redirect to the server list page
-                            window.location.href = PLUGIN_BASE_URL + "/plugins/servlet/metrics";
+                            setTimeout(() => {
+                                window.location.href = PLUGIN_BASE_URL + "/plugins/servlet/metrics";
+                            },2000)
                         }
 
                     },

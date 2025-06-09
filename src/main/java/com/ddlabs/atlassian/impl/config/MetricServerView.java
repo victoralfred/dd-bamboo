@@ -4,9 +4,8 @@ import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.templaterenderer.TemplateRenderer;
 import com.ddlabs.atlassian.impl.cache.MetricServerConfigurationCache;
 import com.ddlabs.atlassian.impl.config.model.AvailableServers;
-import com.ddlabs.atlassian.impl.data.adapter.dto.AvailableServerDTO;
-import com.ddlabs.atlassian.impl.data.adapter.dto.ServerConfigBuilder;
-import com.ddlabs.atlassian.impl.data.adapter.entity.ServerConfigRepository;
+import com.ddlabs.atlassian.dao.adapter.dto.AvailableServerDTO;
+import com.ddlabs.atlassian.dao.adapter.dto.ServerConfigBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +38,8 @@ public class MetricServerView extends HttpServlet {
         userService.authCheck(req, resp);
         Map<String, Object> params =  new HashMap<>();
         final List<AvailableServers> serverConfigs = metricServerConfigurationCache.getAllServerConfigs()
-                .stream().filter(ServerConfigBuilder::nonNull)
+                .stream()
+                .filter(ServerConfigBuilder::nonNull)
                         .map(this::replaceAllEmptyOrNullValueWithEmpty)
                                 .toList();
         resp.setContentType("text/html; charset=UTF-8");
