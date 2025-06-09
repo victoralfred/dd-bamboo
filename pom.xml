@@ -113,10 +113,6 @@
                     <productVersion>${bamboo.version}</productVersion>
                     <productDataVersion>${bamboo.data.version}</productDataVersion>
                     <enableQuickReload>true</enableQuickReload>
-                    <jvmArgs>
-                        -Xmx2g
-                        -Xms2g
-                    </jvmArgs>
                     <!-- See here for an explanation of default instructions: -->
                     <!-- https://developer.atlassian.com/docs/advanced-topics/configuration-of-instructions-in-atlassian-plugins -->
                     <instructions>
@@ -125,8 +121,6 @@
                         <!-- Add package to export here -->
                         <Export-Package>
                             com.ddlabs.atlassian.api,
-                            com.atlassian.activeobjects.external.ActiveObjects,
-                            org.springframework.transaction.annotation.AnnotationTransactionAttributeSource,
                         </Export-Package>
 
                         <!-- Add package import here -->
@@ -134,8 +128,7 @@
                             org.springframework.osgi.*;resolution:="optional",
                             org.eclipse.gemini.blueprint.*;resolution:="optional",
                             javax.ws.rs,
-                            com.atlassian.activeobjects.external.ActiveObjects,
-                            org.springframework.transaction.annotation.AnnotationTransactionAttributeSource,
+                            com.atlassian.activeobjects.external.*,
                             *,
                         </Import-Package>
 

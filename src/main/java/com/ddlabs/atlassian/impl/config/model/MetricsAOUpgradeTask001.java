@@ -3,7 +3,7 @@ package com.ddlabs.atlassian.impl.config.model;
 import com.atlassian.activeobjects.external.ActiveObjects;
 import com.atlassian.activeobjects.external.ActiveObjectsUpgradeTask;
 import com.atlassian.activeobjects.external.ModelVersion;
-import com.ddlabs.atlassian.impl.data.adapter.entity.MSConfigEntity;
+import com.ddlabs.atlassian.dao.adapter.entity.MSConfigEntity;
 
 public class MetricsAOUpgradeTask001 implements ActiveObjectsUpgradeTask {
     @Override

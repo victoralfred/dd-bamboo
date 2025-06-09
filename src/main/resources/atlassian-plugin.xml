@@ -49,15 +49,15 @@
     </servlet>
     <rest key="Authorization and Manifest" path="/metrics" version="1.0">
         <description>Authorization and Manifest Servlet</description>
-        <package>com.ddlabs.atlassian.rest</package>
+        <package>com.ddlabs.atlassian.controller</package>
     </rest>
     <ao key="ao-module">
         <description>Active Objects service used by this Metrics Server configuration</description>
-        <entity>com.ddlabs.atlassian.impl.data.adapter.entity.MSConfigEntity</entity>
+        <entity>com.ddlabs.atlassian.dao.adapter.entity.MSConfigEntity</entity>
         <upgradeTask>com.ddlabs.atlassian.impl.config.model.MetricsAOUpgradeTask001</upgradeTask>
     </ao>
     <bambooEventListener key="metricsEventListeners" name="Collects Metrics Data"
-                         class="com.ddlabs.atlassian.impl.events.MetricsPluginEventListeners">
+                         class="com.ddlabs.atlassian.impl.events.BambooEventListeners">
         <description>Listens for Bamboo events</description>
     </bambooEventListener>
 </atlassian-plugin>
