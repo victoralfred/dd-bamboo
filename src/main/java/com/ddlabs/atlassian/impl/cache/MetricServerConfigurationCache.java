@@ -173,7 +173,7 @@ public class MetricServerConfigurationCache {
      * - Assumes non-null server configurations are returned by the repositories.
      * - Relies on the `LogUtils.logInfo` utility for logging details.
      */
-    public void fetchFromDatabase(){
+    private void fetchFromDatabase(){
         configRepository.findAll().forEach(config -> {
              CACHE.put(config.getServerType(),config);
              LogUtils.logInfo(log,"Cache updated for server type {}", config.getServerType());
