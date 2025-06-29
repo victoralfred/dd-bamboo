@@ -60,4 +60,5 @@
                          class="com.ddlabs.atlassian.impl.events.BambooEventListeners">
         <description>Listens for Bamboo events</description>
     </bambooEventListener>
+    <listener key="localEventHandler" class=" com.ddlabs.atlassian.impl.events.localevent.LocalEventHandler"/>
 </atlassian-plugin>

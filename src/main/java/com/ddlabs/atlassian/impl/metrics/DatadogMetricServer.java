@@ -2,6 +2,8 @@ package com.ddlabs.atlassian.impl.metrics;
 
 import com.ddlabs.atlassian.impl.cache.MetricServerConfigurationCache;
 import com.ddlabs.atlassian.impl.config.model.*;
+import com.ddlabs.atlassian.impl.events.localevents.PluginServerDeletedEvent;
+import com.ddlabs.atlassian.impl.events.localevents.ServerDeletedEvent;
 import com.ddlabs.atlassian.impl.exception.*;
 import com.ddlabs.atlassian.oauth2.CodeVerifierAndChallengeProvider;
 import com.ddlabs.atlassian.oauth2.model.OAuth2Configuration;
@@ -46,7 +48,7 @@ public class DatadogMetricServer implements MetricServer {
                                UserService userService,
                                ConfigRepository configRepository,
                                ServerBodyBuilder serverBodyBuilder,
-                               MetricsApiClientFactory metricsApiClientFactory, MetricServerConfigurationCache metricServerConfigurationCache) {
+                               MetricsApiClientFactory metricsApiClientFactory, MetricServerConfigurationCache metricServerConfigurationCache, PluginServerDeletedEvent pluginServerDeletedEvent) {
         this.serverConfigMapper = serverConfigMapper;
         this.oauth2Service = ValidationUtils.validateNotNull(oauth2Service, "OAuth2Service cannot be null");
         this.userService = ValidationUtils.validateNotNull(userService, "UserService cannot be null");
@@ -57,6 +59,7 @@ public class DatadogMetricServer implements MetricServer {
         this.metricsApiClientFactory = ValidationUtils.validateNotNull(metricsApiClientFactory,
                 "MetricsApiClientFactory cannot be null");
         this.metricServerConfigurationCache = metricServerConfigurationCache;
+        this.pluginServerDeletedEvent = pluginServerDeletedEvent;
     }
     
     @Override
@@ -179,11 +182,12 @@ public class DatadogMetricServer implements MetricServer {
                 "http://localhost:6990/bamboo/rest/metrics/1.0/token"
         );
     }
-
+   private final PluginServerDeletedEvent pluginServerDeletedEvent;
     @Override
     public String deleteServer(String serverName) {
         try{
             configRepository.delete(serverName);
+            pluginServerDeletedEvent.publish(new ServerDeletedEvent(serverName));
             return "success";
         } catch (DataAccessException e) {
             throw new RuntimeException(e);

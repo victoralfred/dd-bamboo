@@ -9,6 +9,7 @@ import com.ddlabs.atlassian.impl.cache.MetricServerConfigurationCache;
 import com.ddlabs.atlassian.impl.config.UserService;
 import com.ddlabs.atlassian.impl.config.model.ServerBodyBuilder;
 
+import com.ddlabs.atlassian.impl.events.localevents.PluginServerDeletedEvent;
 import com.ddlabs.atlassian.impl.metrics.DatadogMetricServer;
 import com.ddlabs.atlassian.impl.metrics.factory.MetricServerFactoryImpl;
 import com.ddlabs.atlassian.impl.metrics.factory.MetricsApiClientFactory;
@@ -37,12 +38,15 @@ class MetricServerFactoryImplTest {
     private MetricsApiClientFactory metricsApiClientFactory;
     @Mock
     private  MetricServerConfigurationCache metricServerConfigurationCache;
+    @Mock
+    private PluginServerDeletedEvent pluginServerDeletedEvent;
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
         metricServers.put("DatadogMetricServer", new DatadogMetricServer(
                 serverConfigMapper,oauth2Service,userService, configRepository,
-                serverBodyBuilder, metricsApiClientFactory,metricServerConfigurationCache
+                serverBodyBuilder, metricsApiClientFactory,metricServerConfigurationCache,
+                pluginServerDeletedEvent
         ));
         metricServers.put("MockedClass", new MockedClass());
     }

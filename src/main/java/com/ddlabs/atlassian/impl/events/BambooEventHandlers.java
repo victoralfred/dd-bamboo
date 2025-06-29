@@ -46,11 +46,9 @@ public class BambooEventHandlers {
             if (event instanceof BuildFinishedEvent buildFinishedEvent) {
                 // Process the build finished event
                 String seriesPoint = createSeriesPoint(
-                        "bamboo.build.status",
                         buildFinishedEvent.getBuildCompletionTimestamp().getTime(),
-                        "1.0",
                         hostName,
-                        MetricType.COUNTER,new BuildTag(buildFinishedEvent.getBuildPlanKey(),
+                        new BuildTag(buildFinishedEvent.getBuildPlanKey(),
                                 String.valueOf(buildFinishedEvent.getBuildNumber()),
                                 buildFinishedEvent.getBuildState().getState())
                 );
@@ -71,23 +69,20 @@ public class BambooEventHandlers {
      * This method builds and formats the required data by combining metric information,
      * timestamp (converted to seconds), value, host details, metric type, and tagging information.
      *
-     * @param metric The name or identifier of the metric. Cannot be null.
-     * @param timestamp The timestamp corresponding to the metric, in milliseconds.
-     *                  It will be converted to seconds internally.
-     * @param value The value of the metric. Cannot be null.
-     * @param hostName The name of the host where the metric is generated. Cannot be null.
-     * @param metricType The type of metric (e.g., COUNTER, GAUGE, etc.). Cannot be null.
+     * @param timestamp  The timestamp corresponding to the metric, in milliseconds.
+     *                   It will be converted to seconds internally.
+     * @param hostName   The name of the host where the metric is generated. Cannot be null.
      * @param metricTags The tagging information associated with the metric, including build details. Cannot be null.
      * @return A string representation of the series point, formatted as per the SeriesBuilder implementation.
      */
-    private String createSeriesPoint(String metric, long timestamp, String value, String hostName,
-                                     MetricType metricType, BuildTag metricTags) {
+    private String createSeriesPoint(long timestamp, String hostName,
+                                     BuildTag metricTags) {
         return seriesBuilder.buildSeries(
-                metric,
+                "bamboo.build.status",
                 String.valueOf(timestamp/1000),
-                value,
+                "1.0",
                 hostName,
-                metricType,
+                MetricType.COUNTER,
                 metricTags
         );
     }

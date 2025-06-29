@@ -4,6 +4,7 @@ import com.ddlabs.atlassian.dao.adapter.dto.ServerConfigBuilder;
 import com.ddlabs.atlassian.dao.adapter.dto.ServerConfigMapper;
 import com.ddlabs.atlassian.dao.adapter.entity.ConfigRepository;
 import com.ddlabs.atlassian.impl.cache.MetricServerConfigurationCache;
+import com.ddlabs.atlassian.impl.events.localevents.PluginServerDeletedEvent;
 import com.ddlabs.atlassian.impl.metrics.factory.MetricsApiClientFactory;
 import com.ddlabs.atlassian.oauth2.model.OAuth2Configuration;
 import com.ddlabs.atlassian.oauth2.model.OAuth2TokenResponse;
@@ -38,6 +39,8 @@ public class DatadogMetricServerTest extends TestCase {
     ServerConfigBuilder serverConfigBuilder;
     @Mock
     private MetricServerConfigurationCache metricServerConfigurationCache;
+    @Mock
+    private PluginServerDeletedEvent pluginServerDeletedEvent;
     @Override
     protected void setUp() throws Exception {
         MockitoAnnotations.openMocks(this);
@@ -48,7 +51,8 @@ public class DatadogMetricServerTest extends TestCase {
                 userService,
                 configRepository,
                 serverBodyBuilder,
-                metricsApiClientFactory,metricServerConfigurationCache
+                metricsApiClientFactory,metricServerConfigurationCache,
+                pluginServerDeletedEvent
         );
         req = mock(HttpServletRequest.class);
 

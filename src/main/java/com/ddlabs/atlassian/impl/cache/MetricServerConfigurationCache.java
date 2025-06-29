@@ -35,13 +35,11 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 public class MetricServerConfigurationCache {
     private final ConfigRepository configRepository;
-    private final ConfigRepository repository;
     private static final Logger log = LoggerFactory.getLogger(MetricServerConfigurationCache.class);
     private final Map<String, ServerConfigBuilder> CACHE = new ConcurrentHashMap<>();
 
-    public MetricServerConfigurationCache(ConfigRepository configRepository, ConfigRepository repository) {
+    public MetricServerConfigurationCache(ConfigRepository configRepository) {
         this.configRepository = configRepository;
-        this.repository = repository;
     }
 
     /**
@@ -174,11 +172,8 @@ public class MetricServerConfigurationCache {
      * - Relies on the `LogUtils.logInfo` utility for logging details.
      */
     private void fetchFromDatabase(){
-        configRepository.findAll().forEach(config -> {
-             CACHE.put(config.getServerType(),config);
-             LogUtils.logInfo(log,"Cache updated for server type {}", config.getServerType());
-         });
-         repository.findAll().forEach(config -> {
+        configRepository.findAll().stream().filter(result-> result != null && result.getServerType() != null)
+                .forEach(config -> {
              CACHE.put(config.getServerType(),config);
              LogUtils.logInfo(log,"Cache updated for server type {}", config.getServerType());
          });

@@ -7,6 +7,7 @@ import com.ddlabs.atlassian.util.LogUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -24,12 +25,11 @@ import static com.ddlabs.atlassian.impl.events.EventUtils.destroy;
  * This service creates a directory for storing failed data entries
  * and processes tasks asynchronously for saving data into a retry queue.
  */
-@Service
+@Component
 public class LocalStorageService {
     private final Logger log = LoggerFactory.getLogger(LocalStorageService.class);
     private final BlockingQueue<String> writeQueue = new LinkedBlockingQueue<>();
     private static final String failed_dir_path = System.getProperty("bamboo.home").concat("/dd-metrics/failed/");
-    private final ObjectMapper objectMapper = new ObjectMapper();
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
     private final MetricServerConfigurationCache metricServerConfigurationCache;
 
@@ -41,11 +41,11 @@ public class LocalStorageService {
         this.httpClient = httpClient;
         createFailedDirector();
     }
-
     @PostConstruct
-    public void startWorker(){
+    public void init(){
         executorService.submit(this::workerLoop);
     }
+
     /**
      * A worker loop that continuously processes tasks from the write queue
      * and writes them to designated files. The method generates unique file names
@@ -75,8 +75,8 @@ public class LocalStorageService {
                 final String dataId = UUID.randomUUID().toString();
                 Path failedDataFile = Path.of(failed_dir_path).resolve(dataId+".json");
                 Files.writeString(failedDataFile, task, StandardCharsets.UTF_8);
-
             } catch (InterruptedException | IOException e) {
+                LogUtils.logError(log, "Worker loop interrupted", e);
                 throw new RuntimeException(e);
             }
         }
@@ -93,8 +93,8 @@ public class LocalStorageService {
     public void createFailedDirector(){
         try{
             Path dir = Paths.get(failed_dir_path);
-            if(!Files.exists(dir.getParent())){
-                Files.createDirectory(dir.getParent());
+            if(!Files.exists(dir)){
+                Files.createDirectory(dir);
                 LogUtils.logInfo(log,"Created failed directory");
             }
         } catch (IOException e) {
@@ -117,6 +117,7 @@ public class LocalStorageService {
             }else {
                 LogUtils.logWarning(log, "Failed to save series point for replay");
         }
+
     }
     @PreDestroy
     public void cleanUp(){
@@ -148,7 +149,7 @@ public class LocalStorageService {
         boolean success = false;
         try(DirectoryStream<Path> stream = Files.newDirectoryStream(Paths.get(failed_dir_path),"*.json")) {
         LogUtils.logInfo(log, "Replay queue is empty. Starting to process failed payloads");
-        while (stream.iterator().hasNext() && !success && retries < MAX_RETRIES) {
+        while (!success && retries < MAX_RETRIES) {
             for(Path filePath: stream ){
                 try {
                     String payload = Files.readString(filePath);
